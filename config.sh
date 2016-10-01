@@ -15,3 +15,9 @@ log_file="log.txt"
 data_dir="data/"
 result_dir="results/"
 fastqc_dir="fastqc/"
+
+## internal helpers
+SUCCESS="\033[32m"
+WARNING="\033[33m"
+BACKGROUND="\033[90m"
+RESET="\033[0m"

@@ -37,19 +37,26 @@ fi
 
 # extract reads of specified length
 echo "Filter fastq ($read_min_len < |seq| < $read_max_len)"
+echo -ne "${BACKGROUND}"
 cutadapt \
     -m $read_min_len \
     -M $read_max_len \
     "$reads_file" \
     -o "$tmp_reads_file" \
 | tee -a "$log_file"
+echo -ne "${RESET}"
 
 # quality assessment
 if [[ ! -d "$fastqc_dir" ]]; then
+    echo "FastQC quality analysis"
+    mkdir -p "$fastqc_dir"
+
+    echo -ne "${BACKGROUND}"
     fastqc \
         --outdir="$fastqc_dir" \
         "$tmp_reads_file" \
     | tee -a "$log_file"
+    echo -ne "${RESET}"
 fi
 
 # generate genome if needed
@@ -57,7 +64,9 @@ if [[ ! -d "$(dirname "$genome")" ]]; then
     echo "Generate genome"
     mkdir genome
 
+    echo -ne "${BACKGROUND}"
     bowtie2-build "$genome_file" "$genome" | tee -a "$log_file"
+    echo -ne "${RESET}"
 else
     echo "Use existing genome"
 fi
@@ -65,12 +74,15 @@ fi
 # map reads
 if [[ ! -f "$sam" ]]; then
     echo "Generate mapping"
+
+    echo -ne "${BACKGROUND}"
     bowtie2 \
         --very-sensitive \
         -x "$genome" \
         -U "$tmp_reads_file" \
         -S "$sam" \
     | tee -a "$log_file"
+    echo -ne "${RESET}"
 
     echo "Convert sam to bam"
     samtools view -b "$sam" > "$bam"
@@ -94,12 +106,18 @@ mkdir -p "$result_dir"
 for script in "./scripts/"*; do
     ext="${script##*.}"
     if [ "$ext" == "py" ]; then
-        echo "[Executing python script \"$script\"]"
+        echo -e "${SUCCESS}[Executing python script \"$script\"]${RESET}"
+
+        echo -ne "${BACKGROUND}"
         python "$script" "$data_dir/sorted" | tee -a "$log_file"
+        echo -ne "${RESET}"
     elif [ "$ext" == "sh" ]; then
-        echo "[Executing shell script \"$script\"]"
+        echo -e "${SUCCESS}[Executing shell script \"$script\"]${RESET}"
+
+        echo -ne "${BACKGROUND}"
         "$script" "$data_dir/sorted" | tee -a "$log_file"
+        echo -ne "${RESET}"
     else
-        echo "[Unknown extension \"$ext\"]"
+        echo -e "${WARNING}[Unknown extension \"$ext\"]${RESET}"
     fi
 done
