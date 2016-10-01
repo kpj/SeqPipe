@@ -31,7 +31,7 @@ for file in $(find "$read_dir" -name "*.fastq.gz"); do
     # prepare directory
     gunzip -c "$cwd/$fname" > "$cwd/reads.fastq"
     cp "$rel_dir/scripts/"* "$cwd"
-    cp "$genome_file" "$cwd"
+    cp "$genome_file" "$cwd/genome.fa"
 
     # start analysis
     "$rel_dir/map_reads.sh" "$cwd"

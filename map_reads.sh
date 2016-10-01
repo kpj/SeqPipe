@@ -36,16 +36,16 @@ cd "$1"
 # check if needed files exist
 if [[ ! -f "$genome_fasta" ]] ; then
     echo "No genome found ($genome_fasta)"
-    exit
+    exit 1
 fi
 if [[ ! -f "$inp_reads" ]] ; then
     echo "No reads found ($inp_reads)"
-    exit
+    exit 1
 fi
 
 if [[ ! -f "$pyscript" ]] ; then
     echo "No python script found ($pyscript)"
-    exit
+    exit 1
 fi
 
 ## begin of pipeline
