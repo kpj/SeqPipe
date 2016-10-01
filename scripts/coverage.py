@@ -357,7 +357,7 @@ def main(base_fname):
         plt.legend(loc='best')
 
         plt.tight_layout()
-        fig.savefig('images/coverage_{}.pdf'.format(ref))
+        fig.savefig('results/coverage_{}.pdf'.format(ref))
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:

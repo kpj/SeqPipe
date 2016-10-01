@@ -4,47 +4,49 @@
 
 set -e
 set -u
+. config.sh
 
 
-if [[ $# -ne 2 ]] ; then
+if [[ $# -ne 2 ]]; then
     echo "Usage: $0 <path to reads> <path to reference genome file>"
     exit
 fi
 
-rel_dir="$(dirname "$0")"
-read_dir="$1"
-genome_file="$2"
+cur_wd="$(dirname "$0")"
+inp_read_dir="$1"
+inp_genome_file="$2"
 
 # process reads
-wd="mapping_result"
-mkdir -p "$wd"
+mkdir -p "$output_dir"
 
-for file in $(find "$read_dir" -name "*.fastq.gz"); do
+for file in $(find "$inp_read_dir" -name "*.fastq.gz"); do
     # book-keeping
     id=$(basename $file | cut -d'_' -f1)
     fname=$(basename $file)
 
-    cwd="$wd/runs/$id"
-    mkdir -p "$cwd"
-    cp "$file" "$cwd"
+    analysis_wd="$output_dir/runs/$id"
+    mkdir -p "$analysis_wd"
+    cp "$file" "$analysis_wd"
 
     # prepare directory
-    gunzip -c "$cwd/$fname" > "$cwd/reads.fastq"
-    cp "$rel_dir/scripts/"* "$cwd"
-    cp "$genome_file" "$cwd/genome.fa"
+    gunzip -c "$analysis_wd/$fname" > "$analysis_wd/reads.fastq"
+    cp -r "$cur_wd/scripts/" "$analysis_wd/scripts"
+    cp "$inp_genome_file" "$analysis_wd/$genome_file"
 
     # start analysis
-    "$rel_dir/map_reads.sh" "$cwd"
+    "$cur_wd/map_reads.sh" "$analysis_wd"
 done
 
 
 # gather results
-img_dir="$wd/images"
-mkdir -p "$img_dir"
+res_dir="$output_dir/results"
+mkdir -p "$res_dir"
 
-for dir in "$wd/runs/"*; do
-    for img in "$dir/images/"*; do
-        echo $img
-        cp "$img" "$img_dir"
+echo "Gathering results"
+for dir in "$output_dir/runs/"*; do
+    echo " > $dir"
+    for res in "$dir/results/"*; do
+        echo "  - $res"
+        cp "$res" "$res_dir"
     done
 done
