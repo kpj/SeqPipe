@@ -30,7 +30,7 @@ for file in $(find "$inp_read_dir" -name "*.fastq.gz"); do
 
     # prepare directory
     gunzip -c "$analysis_wd/$fname" > "$analysis_wd/reads.fastq"
-    cp -r "$cur_wd/scripts/" "$analysis_wd/scripts"
+    cp -r "$cur_wd/scripts/" "$analysis_wd/"
     cp "$inp_genome_file" "$analysis_wd/$genome_file"
 
     # start analysis
@@ -44,9 +44,11 @@ mkdir -p "$res_dir"
 
 echo "Gathering results"
 for dir in "$output_dir/runs/"*; do
-    echo " > $dir"
+    id="$(basename $dir)"
+    echo " > $id"
+    mkdir -p "$res_dir/$id/"
     for res in "$dir/results/"*; do
         echo "  - $res"
-        cp "$res" "$res_dir"
+        cp "$res" "$res_dir/$id/"
     done
 done

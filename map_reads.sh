@@ -118,6 +118,6 @@ for script in "./scripts/"*; do
         "$script" "$data_dir/sorted" | tee -a "$log_file"
         echo -ne "${RESET}"
     else
-        echo -e "${WARNING}[Unknown extension \"$ext\"]${RESET}"
+        echo -e "${WARNING}[Unknown extension \"$ext\" for \"$script\"]${RESET}"
     fi
 done

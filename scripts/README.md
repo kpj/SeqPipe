@@ -1,4 +1,9 @@
 # Script archive
 
-Contains all kinds of useful script to be executed on sequencing data.
-Check each files docstring for more information.
+At the end of each alignment process, all scripts will be executed on the resulting (sorted) bam file. They should thus have the following signature:
+```
+<script> <path to bam>
+```
+The currently supported script formats are:
+* `*.py`: Python scripts
+* `*.sh`: Bash scripts
