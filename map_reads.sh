@@ -4,7 +4,7 @@
 
 set -e
 set -u
-. config.sh
+. "$(dirname "$0")/config.sh"
 
 ## initial setup
 genome="genome/genome"

@@ -4,7 +4,6 @@
 
 set -e
 set -u
-. config.sh
 
 
 if [[ $# -ne 2 ]]; then
@@ -15,6 +14,8 @@ fi
 cur_wd="$(dirname "$0")"
 inp_read_dir="$1"
 inp_genome_file="$2"
+
+. "$cur_wd/config.sh"
 
 # process reads
 mkdir -p "$output_dir"
