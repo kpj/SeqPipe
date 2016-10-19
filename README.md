@@ -28,3 +28,4 @@ Note: make sure to delete old results before creating new ones.
     * bowtie -a -v 1 --sam genome/genome data/reads.fastq out.sam
     * samtools view -b out.sam > out.bam
     * [samtools sort -o sorted.bam out.bam]
+    * spec: https://samtools.github.io/hts-specs/SAMv1.pdf
