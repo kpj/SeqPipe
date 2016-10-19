@@ -97,6 +97,9 @@ if [[ ! -d "$data_dir" ]]; then
     # sort bam into different directory
     echo "Sort bam"
     samtools sort -o "$data_dir/sorted.bam" "$bam"
+
+    # store only aligned reads
+    samtools view -F 4 -o "aligned_reads.sam" "$data_dir/sorted.bam"
 fi
 
 # (re)create results using scripts
