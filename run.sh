@@ -26,13 +26,13 @@ for file in $(find "$inp_read_dir" -name "*.fastq.gz"); do
     fname=$(basename $file)
 
     analysis_wd="$output_dir/runs/$id"
-    mkdir -p "$analysis_wd"
-    cp "$file" "$analysis_wd"
+    mkdir -p "$analysis_wd/input"
+    cp "$file" "$analysis_wd/input"
 
     # prepare directory
-    gunzip -c "$analysis_wd/$fname" > "$analysis_wd/reads.fastq"
+    gunzip -c "$analysis_wd/input/$fname" > "$analysis_wd/input/reads.fastq"
     cp -r "$cur_wd/scripts/" "$analysis_wd/"
-    cp "$inp_genome_file" "$analysis_wd/$genome_file"
+    cp "$inp_genome_file" "$analysis_wd/input/$genome_file"
 
     # start analysis
     "$cur_wd/map_reads.sh" "$analysis_wd"

@@ -9,7 +9,7 @@ set -u
 ## initial setup
 genome="genome/genome"
 
-fname_pref="out"
+fname_pref="$data_dir/tmp"
 tmp_reads_file="${fname_pref}.fastq"
 bam="${fname_pref}.bam"
 sam="${fname_pref}.sam"
@@ -24,13 +24,17 @@ cd "$1"
 > "$log_file" # clear log file
 
 # check if needed files exist
-if [[ ! -f "$genome_file" ]]; then
-    echo "No genome found ($genome_file)"
+if [[ ! -f "./input/$genome_file" ]]; then
+    echo "No genome found (./input/$genome_file)"
     exit 1
 fi
-if [[ ! -f "$reads_file" ]]; then
-    echo "No reads found ($reads_file)"
+if [[ ! -f "./input/$reads_file" ]]; then
+    echo "No reads found (./input/$reads_file)"
     exit 1
+fi
+
+if [[ ! -d "$data_dir" ]]; then
+    mkdir -p "$data_dir"
 fi
 
 ## begin of pipeline
@@ -41,7 +45,7 @@ echo -ne "${BACKGROUND}"
 cutadapt \
     -m $read_min_len \
     -M $read_max_len \
-    "$reads_file" \
+    "./input/$reads_file" \
     -o "$tmp_reads_file" \
 | tee -a "$log_file"
 echo -ne "${RESET}"
@@ -65,7 +69,7 @@ if [[ ! -d "$(dirname "$genome")" ]]; then
     mkdir genome
 
     echo -ne "${BACKGROUND}"
-    bowtie2-build "$genome_file" "$genome" | tee -a "$log_file"
+    bowtie2-build "./input/$genome_file" "$genome" | tee -a "$log_file"
     echo -ne "${RESET}"
 else
     echo "Use existing genome"
@@ -90,17 +94,13 @@ else
     echo "Use existing mapping"
 fi
 
-# post-process bam
-if [[ ! -d "$data_dir" ]]; then
-    mkdir "$data_dir"
+## post-process bam
+# sort bam into different directory
+echo "Sort bam"
+samtools sort -o "$data_dir/sorted.bam" "$bam"
 
-    # sort bam into different directory
-    echo "Sort bam"
-    samtools sort -o "$data_dir/sorted.bam" "$bam"
-
-    # store only aligned reads
-    samtools view -F 4 -o "aligned_reads.sam" "$data_dir/sorted.bam"
-fi
+# store only aligned reads
+samtools view -F 4 -o "aligned_reads.sam" "$data_dir/sorted.bam"
 
 # (re)create results using scripts
 rm -rf "$result_dir"

@@ -141,7 +141,7 @@ def annotate_peak_positions(references, df_cov, depth_thres=1e4):
 
 def annotate_read_pattern(
     references, df_cov, bam_fname,
-    cache_fname='coverage_annos.txt'
+    cache_fname='data/coverage_annos.txt'
 ):
     """
     Annotate each peak with corresponding read pattern.
