@@ -7,7 +7,7 @@ set -u
 
 
 if [[ $# -ne 2 ]]; then
-    echo "Usage: $0 <path to reads> <path to reference genome file>"
+    echo "Usage: $0 <path to read directory> <path to reference genome file>"
     exit
 fi
 
