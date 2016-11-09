@@ -100,6 +100,7 @@ echo "Sort bam"
 samtools sort -o "$data_dir/sorted.bam" "$bam"
 
 # store only aligned reads
+echo "Generating additional data"
 samtools view -F 4 -o "aligned_reads.sam" "$data_dir/sorted.bam"
 
 # (re)create results using scripts
