@@ -4,7 +4,7 @@
 
 Execute `run.sh` as follows:
 ```
-$ ./main.sh <path to read directory> <path to reference genome file>
+$ ./main.sh <path to read directory/read itself> <path to reference genome file>
 ```
 This will create a `mapping_results` directory which contains two directories:
 * `runs` stores all data related to each individual read file

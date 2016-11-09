@@ -7,12 +7,12 @@ set -u
 
 
 if [[ $# -ne 2 ]]; then
-    echo "Usage: $0 <path to read directory> <path to reference genome file>"
+    echo "Usage: $0 <path to read (directory)> <path to reference genome file>"
     exit
 fi
 
 cur_wd="$(dirname "$0")"
-inp_read_dir="$1"
+inp_read="$1"
 inp_genome_file="$2"
 
 . "$cur_wd/config.sh"
@@ -20,10 +20,11 @@ inp_genome_file="$2"
 # process reads
 mkdir -p "$output_dir"
 
-for file in $(find "$inp_read_dir" -name "*.fastq.gz"); do
+for file in $(find "$inp_read" -name "*.fastq.gz"); do
     # book-keeping
     id=$(basename $file | cut -d'_' -f1)
     fname=$(basename $file)
+    echo -ne "${INFO}" ">> Handling \"$fname\" <<" "${RESET}\n"
 
     analysis_wd="$output_dir/runs/$id"
     mkdir -p "$analysis_wd/input"
