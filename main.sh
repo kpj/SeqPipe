@@ -22,11 +22,10 @@ mkdir -p "$output_dir"
 
 for file in $(find "$inp_read" -name "*.fastq.gz"); do
     # book-keeping
-    id=$(basename $file | cut -d'_' -f1)
     fname=$(basename $file)
     echo -ne "${INFO}" ">> Handling \"$fname\" <<" "${RESET}\n"
 
-    analysis_wd="$output_dir/runs/$id"
+    analysis_wd="$output_dir/runs/$fname"
     mkdir -p "$analysis_wd/input"
     cp "$file" "$analysis_wd/input"
 
@@ -36,7 +35,7 @@ for file in $(find "$inp_read" -name "*.fastq.gz"); do
     cp "$inp_genome_file" "$analysis_wd/input/$genome_file"
 
     # start analysis
-    "$cur_wd/map_reads.sh" "$analysis_wd"
+    "$cur_wd/pipeline.sh" "$analysis_wd"
 done
 
 
