@@ -2,7 +2,8 @@
 # General variable definitions
 
 ## pipeline options
-output_dir="mapping_result"
+ts=$(date +"%Y-%m-%d_%H-%M-%S")
+default_output_dir="${ts}_mapping_result"
 
 read_min_len=0
 read_max_len=100

@@ -6,8 +6,8 @@ set -e
 set -u
 
 
-if [[ $# -ne 2 ]]; then
-    echo "Usage: $0 <path to read (directory)> <path to reference genome file>"
+if [[ $# -ne 2 && $# -ne 3 ]]; then
+    echo "Usage: $0 <path to read (directory)> <path to reference genome file> [output directory]"
     exit
 fi
 
@@ -18,6 +18,7 @@ inp_genome_file="$2"
 . "$cur_wd/config.sh"
 
 # process reads
+output_dir="${3:-$default_output_dir}"
 mkdir -p "$output_dir"
 
 for file in $(find "$inp_read" -name "*.fastq.gz"); do
