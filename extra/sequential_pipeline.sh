@@ -77,6 +77,9 @@ for file in $(find "$inp_genome_dir" -name "*.fa" | sort -h); do
     next_stage="${stage}_${fname%%.fa}"
     read_input="$output_dir/$stage/input/"
 
+    # store some extra information
+    echo "$fname" > "$output_dir/$stage/info.txt"
+
     #echo "Input: \"$read_input\""
     do_mapping "$read_input" "$file" "$stage" read_output
     #echo "Output: \"$read_output\""

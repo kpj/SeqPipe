@@ -27,10 +27,13 @@ def main(fname):
     for stage in os.listdir(fname):
         out_dir = os.path.join(fname, stage, 'output')
         if os.path.exists(out_dir):
+            with open(os.path.join(fname, stage, 'info.txt')) as fd:
+                stage_name = fd.read()
+
             for read in data.keys():
                 cur_dir = os.path.join(out_dir, read + '_extra')
                 res = analyze_entry(cur_dir)
-                data[read][stage] = res
+                data[read][stage_name] = res
 
     # visualize data
     fig, axarr = plt.subplots(1, len(data), figsize=(20,8))
