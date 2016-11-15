@@ -12,6 +12,13 @@ This will create a `mapping_results` directory which contains two directories:
 
 Note: make sure to delete old results before creating new ones.
 
+## Extras
+
+Additional useful scripts are contained in `extra`.
+
+* `sequential_pipeline.sh`
+  * map length-filtered reads against multiple genomes in succession
+
 ## Dependencies
 
 * cutadapt

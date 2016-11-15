@@ -21,7 +21,7 @@ inp_genome_file="$2"
 output_dir="${3:-$default_output_dir}"
 mkdir -p "$output_dir"
 
-for file in $(find "$inp_read" -name "*.fastq.gz"); do
+for file in $(find "$inp_read" \( -name "*.fastq.gz" -o -name "*.fastq" \)); do
     # book-keeping
     fname=$(basename $file)
     echo -ne "${INFO}" ">> Handling \"$fname\" <<" "${RESET}\n"
@@ -31,7 +31,11 @@ for file in $(find "$inp_read" -name "*.fastq.gz"); do
     cp "$file" "$analysis_wd/input"
 
     # prepare directory
-    gunzip -c "$analysis_wd/input/$fname" > "$analysis_wd/input/reads.fastq"
+    if [[ "$fname" == *".gz" ]]; then
+        gunzip -c "$analysis_wd/input/$fname" > "$analysis_wd/input/reads.fastq"
+    else
+        cp "$analysis_wd/input/$fname" "$analysis_wd/input/reads.fastq"
+    fi
     cp -r "$cur_wd/scripts/" "$analysis_wd/"
     cp "$inp_genome_file" "$analysis_wd/input/$genome_file"
 
