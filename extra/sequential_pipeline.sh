@@ -77,9 +77,9 @@ for file in $(find "$inp_genome_dir" -name "*.fa" | sort -h); do
     next_stage="${stage}_${fname%%.fa}"
     read_input="$output_dir/$stage/input/"
 
-    echo "Input: \"$read_input\""
+    #echo "Input: \"$read_input\""
     do_mapping "$read_input" "$file" "$stage" read_output
-    echo "Output: \"$read_output\""
+    #echo "Output: \"$read_output\""
 
     # put current stage's output as next stage's input
     mkdir -p "$output_dir/$next_stage/input"

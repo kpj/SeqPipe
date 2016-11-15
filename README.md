@@ -18,6 +18,8 @@ Additional useful scripts are contained in `extra`.
 
 * `sequential_pipeline.sh`
   * map length-filtered reads against multiple genomes in succession
+* `plot_sequential_data.py`
+  * visualize data obtained from sequential pipeline
 
 ## Dependencies
 
@@ -29,3 +31,12 @@ Additional useful scripts are contained in `extra`.
   * [specifications](https://samtools.github.io/hts-specs/SAMv1.pdf)
 * python
 * bedtools
+
+* bash
+* python
+  * numpy
+  * pandas
+  * seaborn
+  * matplotlib
+  * tqdm
+  * biopython
