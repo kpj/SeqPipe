@@ -32,7 +32,10 @@ function do_mapping {
     local map_dir="$output_dir/$stage/mapping"
     local out_dir="$output_dir/$stage/output"
 
-    "$cur_wd/../main.sh" "$cur_read" "$genome_file" "$map_dir" &> /dev/null
+    mkdir -p "$map_dir"
+    local map_log="$map_dir/log.txt"
+
+    "$cur_wd/../main.sh" "$cur_read" "$genome_file" "$map_dir" &> "$map_log"
 
     # copy bam files (as fastq) to output directory
     mkdir -p "$out_dir"
