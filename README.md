@@ -23,15 +23,16 @@ Additional useful scripts are contained in `extra`.
 
 ## Dependencies
 
+Tools:
 * cutadapt
 * fastqc
   * [more info](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/Help/3%20Analysis%20Modules/)
 * bowtie2
 * samtools
   * [specifications](https://samtools.github.io/hts-specs/SAMv1.pdf)
-* python
 * bedtools
 
+Languages:
 * bash
 * python
   * numpy
