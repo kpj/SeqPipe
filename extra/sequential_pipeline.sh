@@ -64,11 +64,16 @@ function do_mapping {
 # process reads
 stage="initial"
 
+echo -ne "${BACKGROUND}"
+echo "Preparing..."
 mkdir -p "$output_dir/$stage/input/"
 for file in $(find "$inp_read" -name "*.fastq.gz"); do
     out="$output_dir/$stage/input/$(basename ${file%%.gz})"
+    echo " > $file -> $out"
     gunzip -c "$file" > "$out"
 done
+echo "Starting..."
+echo -ne "${RESET}"
 
 for file in $(find "$inp_genome_dir" -name "*.fa" | sort -h); do
     fname=$(basename $file)
