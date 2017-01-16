@@ -78,9 +78,15 @@ done
 echo "Starting..."
 echo -ne "${RESET}"
 
+stage_num=0
 for file in $(find "$inp_genome_dir" -name "*.fa" | sort -h); do
     fname=$(basename $file)
-    echo -ne "${INFO}" ">> $fname ($stage) <<" "${RESET}\n"
+    echo -ne "${INFO}" "\r>> STAGE #$stage_num <<" "${RESET}\n"
+    echo -ne "${BACKGROUND}"
+    echo " > stage: $stage"
+    echo " > file: $fname"
+    echo " > directory: $output_dir/$stage/"
+    echo -ne "${RESET}"
 
     next_stage="${stage}_${fname%%.fa}"
     read_input="$output_dir/$stage/input/"
@@ -88,13 +94,12 @@ for file in $(find "$inp_genome_dir" -name "*.fa" | sort -h); do
     # store some extra information
     echo "$fname" > "$output_dir/$stage/info.txt"
 
-    #echo "Input: \"$read_input\""
     do_mapping "$read_input" "$file" "$stage" read_output
-    #echo "Output: \"$read_output\""
 
     # put current stage's output as next stage's input
     mkdir -p "$output_dir/$next_stage/input"
     cp "$read_output/"* "$output_dir/$next_stage/input/" &> /dev/null || true
 
     stage="$next_stage"
+    stage_num=$(($stage_num+1))
 done
