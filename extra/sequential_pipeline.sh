@@ -35,7 +35,12 @@ function do_mapping {
     mkdir -p "$map_dir"
     local map_log="$map_dir/log.txt"
 
+    set +e
     "$cur_wd/../main.sh" "$cur_read" "$genome_file" "$map_dir" &> "$map_log"
+    if [[ $? -ne 0 ]] ; then
+        return 1
+    fi
+    set -e
 
     # copy bam files (as fastq) to output directory
     mkdir -p "$out_dir"
@@ -95,6 +100,12 @@ for file in $(find "$inp_genome_dir" -name "*.fa" | sort -h); do
     echo "$fname" > "$output_dir/$stage/info.txt"
 
     do_mapping "$read_input" "$file" "$stage" read_output
+    if [[ $? -ne 0 ]] ; then
+        echo -ne "${ERROR}"
+        echo "!! ERROR !!"
+        echo -ne "${RESET}"
+        exit 1
+    fi
 
     # put current stage's output as next stage's input
     mkdir -p "$output_dir/$next_stage/input"

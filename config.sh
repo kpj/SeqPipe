@@ -20,6 +20,7 @@ fastqc_dir="fastqc/"
 ## internal helpers
 SUCCESS="\033[32m"
 WARNING="\033[33m"
+ERROR="\033[31m"
 BACKGROUND="\033[90m"
 INFO="\033[36m"
 RESET="\033[0m"
