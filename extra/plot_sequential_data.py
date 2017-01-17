@@ -6,8 +6,9 @@ import os
 import sys
 import subprocess
 
-import matplotlib.pyplot as plt
 from Bio import SeqIO
+from tqdm import tqdm
+import matplotlib.pyplot as plt
 
 
 def analyze_entry(path, fname='aligned_reads.fastq'):
@@ -29,19 +30,21 @@ def main(fname):
     totals = {}
 
     # check given read-files
+    print('> Getting absolute counts for each input read-file')
     read_dir = '{}/initial/input/'.format(fname)
-    for read_file in os.listdir(read_dir):
+    for read_file in tqdm(os.listdir(read_dir)):
         data[read_file] = {}
         totals[read_file] = analyze_entry(read_dir, fname=read_file)
 
     # acquire data
-    for stage in os.listdir(fname):
+    print('> Counting mapped reads per stage')
+    for stage in tqdm(os.listdir(fname)):
         out_dir = os.path.join(fname, stage, 'output')
         if os.path.exists(out_dir):
             with open(os.path.join(fname, stage, 'info.txt')) as fd:
                 stage_name = fd.read()
 
-            for read in data.keys():
+            for read in tqdm(data.keys()):
                 cur_dir = os.path.join(out_dir, read + '_extra')
                 res = analyze_entry(cur_dir)
                 data[read][stage_name] = res
@@ -49,7 +52,8 @@ def main(fname):
     # visualize data
     fig, axarr = plt.subplots(1, len(data), figsize=(20,8))
 
-    for (read_name, dat), ax in zip(data.items(), axarr):
+    print('\n> Creating plot')
+    for (read_name, dat), ax in tqdm(zip(data.items(), axarr), total=len(data)):
         names, values = [], []
         for n, v in dat.items():
             names.append(n)
