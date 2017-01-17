@@ -4,14 +4,25 @@ Visualize fraction of reads mapped to intermediate results
 
 import os
 import sys
+import subprocess
 
 import matplotlib.pyplot as plt
 from Bio import SeqIO
 
 
 def analyze_entry(path, fname='aligned_reads.fastq'):
-    records = SeqIO.parse(os.path.join(path, fname), 'fastq')
-    return len(list(records))
+    #records = SeqIO.parse(os.path.join(path, fname), 'fastq')
+    #return len(list(records))
+
+    # hacky (but faster) way to count sequences in fastq
+    if os.path.getsize(os.path.join(path, fname)) == 0:
+        return 0
+
+    cproc = subprocess.run(
+        ['grep', '-c', '^@', os.path.join(path, fname)],
+        check=True, stdout=subprocess.PIPE)
+    res = cproc.stdout.decode('utf-8').rstrip()
+    return int(res)
 
 def main(fname):
     data = {}
