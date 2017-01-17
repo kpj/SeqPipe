@@ -4,6 +4,7 @@ Visualize fraction of reads mapped to intermediate results
 
 import os
 import sys
+import shutil
 import subprocess
 
 from Bio import SeqIO
@@ -50,10 +51,13 @@ def main(fname):
                 data[read][stage_name] = res
 
     # visualize data
-    fig, axarr = plt.subplots(1, len(data), figsize=(20,8))
+    out_dir = fname.rstrip('/') + '_images'
+    if os.path.exists(out_dir):
+        shutil.rmtree(out_dir)
+    os.makedirs(out_dir)
 
-    print('\n> Creating plot')
-    for (read_name, dat), ax in tqdm(zip(data.items(), axarr), total=len(data)):
+    print('\n> Creating plots')
+    for read_name, dat in tqdm(data.items()):
         names, values = [], []
         for n, v in dat.items():
             names.append(n)
@@ -63,13 +67,16 @@ def main(fname):
         names.append('no match')
         values.append(totals[read_name]-tot)
 
-        ax.pie(
+        plt.figure()
+        plt.pie(
             values, labels=names, explode=(.03,)*len(values),
             autopct='%1.1f%%', shadow=True)
-        ax.axis('equal')
-        ax.set_title(read_name)
+        plt.axis('equal')
+        plt.title(read_name)
 
-    plt.savefig('output.pdf')
+        plt.tight_layout()
+        plt.savefig(os.path.join(out_dir, read_name.replace(' ', '_')) + '.pdf')
+        plt.close()
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
