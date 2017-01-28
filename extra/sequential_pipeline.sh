@@ -114,3 +114,7 @@ for file in $(find "$inp_genome_dir" -name "*.fa" | sort -h); do
     stage="$next_stage"
     stage_num=$(($stage_num+1))
 done
+
+echo -ne "${SUCCESS}"
+echo "!! SUCCESS !!"
+echo -ne "${SUCCESS}"
