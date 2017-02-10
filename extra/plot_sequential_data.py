@@ -35,7 +35,11 @@ def main(fname):
     read_dir = '{}/initial/input/'.format(fname)
     for read_file in tqdm(os.listdir(read_dir)):
         data[read_file] = {}
-        totals[read_file] = analyze_entry(read_dir, fname=read_file)
+        totals[read_file] = analyze_entry(
+            os.path.join(
+                '{}/initial/mapping/runs/'.format(fname),
+                read_file, 'data'
+            ), fname='tmp.fastq')
 
     # acquire data
     print('> Counting mapped reads per stage')
