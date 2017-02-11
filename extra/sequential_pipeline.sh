@@ -117,4 +117,4 @@ done
 
 echo -ne "${SUCCESS}"
 echo "!! SUCCESS !!"
-echo -ne "${SUCCESS}"
+echo -ne "${RESET}"
