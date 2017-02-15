@@ -7,12 +7,17 @@ import sys
 import shutil
 import subprocess
 
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
 from Bio import SeqIO
 from tqdm import tqdm
-import matplotlib.pyplot as plt
 
 
 def analyze_entry(path, fname='aligned_reads.fastq'):
+    """ Count entries in given FASTQ file
+    """
     #records = SeqIO.parse(os.path.join(path, fname), 'fastq')
     #return len(list(records))
 
@@ -26,50 +31,77 @@ def analyze_entry(path, fname='aligned_reads.fastq'):
     res = cproc.stdout.decode('utf-8').rstrip()
     return int(res)
 
-def main(fname):
-    data = {}
-    totals = {}
+def compute_statistics(fname_base):
+    """ Compute read-count statistics
+    """
+    fname_result = fname_base.rstrip('/') + '_statistics'
+    fname_cache = os.path.join(fname_result, 'stats.csv')
 
-    # check given read-files
+    if os.path.exists(fname_cache):
+        print('Cached', fname_cache)
+        return pd.read_csv(fname_cache, index_col=0)
+
+    if not os.path.exists(fname_result):
+        os.makedirs(fname_result)
+
+    # compute statistics
+    total_counts = {}
+    read_file_list = []
+    df = pd.DataFrame()
+
     print('> Getting absolute counts for each input read-file')
-    read_dir = '{}/initial/input/'.format(fname)
+    read_dir = '{}/initial/input/'.format(fname_base)
     for read_file in tqdm(os.listdir(read_dir)):
-        data[read_file] = {}
-        totals[read_file] = analyze_entry(
+        read_file_list.append(read_file)
+        total_counts[read_file] = analyze_entry(
             os.path.join(
-                '{}/initial/mapping/runs/'.format(fname),
+                '{}/initial/mapping/runs/'.format(fname_base),
                 read_file, 'data'
             ), fname='tmp.fastq')
 
-    # acquire data
-    print('> Counting mapped reads per stage')
-    for stage in tqdm(os.listdir(fname)):
-        out_dir = os.path.join(fname, stage, 'output')
+    for stage in tqdm(os.listdir(fname_base)):
+        out_dir = os.path.join(fname_base, stage, 'output')
         if os.path.exists(out_dir):
-            with open(os.path.join(fname, stage, 'info.txt')) as fd:
-                stage_name = fd.read()
+            with open(os.path.join(fname_base, stage, 'info.txt')) as fd:
+                reference = fd.read()
 
-            for read in tqdm(data.keys()):
-                cur_dir = os.path.join(out_dir, read + '_extra')
-                res = analyze_entry(cur_dir)
-                data[read][stage_name] = res
+            for fname_read in tqdm(read_file_list):
+                cur_dir = os.path.join(out_dir, fname_read + '_extra')
+                count = analyze_entry(cur_dir)
 
-    # visualize data
-    out_dir = fname.rstrip('/') + '_images'
-    if os.path.exists(out_dir):
-        shutil.rmtree(out_dir)
-    os.makedirs(out_dir)
+                df = df.append({
+                    'read_name': fname_read,
+                    'reference': reference.strip(),
+                    'count': count
+                }, ignore_index=True)
+
+    # count no-match entries
+    nm_data = []
+    for read_name, group in df.groupby('read_name'):
+        cur_count = group['count'].sum()
+        tot_count = total_counts[read_name]
+
+        nm_data.append({
+            'read_name': read_name,
+            'reference': 'no match',
+            'count': tot_count-cur_count
+        })
+    df = df.append(nm_data, ignore_index=True)
+
+    df.to_csv(fname_cache)
+    return df
+
+def plot_piecharts(df, fname_base):
+    """ Visualize read-distribution over sources and references
+    """
+    fname_result = fname_base.rstrip('/') + '_statistics'
 
     print('\n> Creating plots')
-    for read_name, dat in tqdm(data.items()):
+    for read_name, group in df.groupby('read_name'):
         names, values = [], []
-        for n, v in dat.items():
-            names.append(n)
-            values.append(v)
-
-        tot = sum(values)
-        names.append('no match')
-        values.append(totals[read_name]-tot)
+        for i, row in group.iterrows():
+            names.append(row['reference'])
+            values.append(row['count'])
 
         plt.figure()
         plt.pie(
@@ -78,13 +110,21 @@ def main(fname):
         plt.axis('equal')
         plt.title(read_name)
 
-        plt.tight_layout()
-        plt.savefig(os.path.join(out_dir, read_name.replace(' ', '_')) + '.pdf')
+        #plt.tight_layout()
+        plt.savefig(os.path.join(fname_result, read_name.replace(' ', '_')) + '.pdf')
         plt.close()
+
+def main(fname):
+    df = compute_statistics(fname)
+    plot_piecharts(df, fname)
+
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
         print('Usage: {} <seq. data dir>'.format(sys.argv[0]))
         exit(-1)
+
+    sns.set_style('white')
+    plt.style.use('seaborn-poster')
 
     main(sys.argv[1])
