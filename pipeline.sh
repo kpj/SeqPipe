@@ -47,7 +47,7 @@ cutadapt \
     -M $read_max_len \
     "./input/$reads_file" \
     -o "$tmp_reads_file" \
-| tee -a "$log_file"
+|& tee -a "$log_file"
 echo -ne "${RESET}"
 
 # quality assessment
@@ -59,7 +59,7 @@ if [[ ! -d "$fastqc_dir" ]]; then
     fastqc \
         --outdir="$fastqc_dir" \
         "$tmp_reads_file" \
-    | tee -a "$log_file"
+    |& tee -a "$log_file"
     echo -ne "${RESET}"
 fi
 
@@ -69,8 +69,9 @@ if [[ ! -d "$(dirname "$genome")" ]]; then
     mkdir genome
 
     echo -ne "${BACKGROUND}"
-    bowtie2-build "./input/$genome_file" "$genome" | tee -a "$log_file"
+    bowtie2-build "./input/$genome_file" "$genome" > /dev/null
     echo -ne "${RESET}"
+    echo "[bowtie2-build stdout truncated]" >> "$log_file"
 else
     echo "Use existing genome"
 fi
@@ -85,7 +86,7 @@ if [[ ! -f "$sam" ]]; then
         -x "$genome" \
         -U "$tmp_reads_file" \
         -S "$sam" \
-    | tee -a "$log_file"
+    |& tee -a "$log_file"
     echo -ne "${RESET}"
 
     echo "Convert sam to bam"
@@ -114,13 +115,13 @@ for script in "./scripts/"*; do
         echo -e "${SUCCESS}[Executing python script \"$script\"]${RESET}"
 
         echo -ne "${BACKGROUND}"
-        python "$script" "$data_dir/sorted" | tee -a "$log_file"
+        python "$script" "$data_dir/sorted" |& tee -a "$log_file"
         echo -ne "${RESET}"
     elif [ "$ext" == "sh" ]; then
         echo -e "${SUCCESS}[Executing shell script \"$script\"]${RESET}"
 
         echo -ne "${BACKGROUND}"
-        "$script" "$data_dir/sorted" | tee -a "$log_file"
+        "$script" "$data_dir/sorted" |& tee -a "$log_file"
         echo -ne "${RESET}"
     else
         echo -e "${WARNING}[Unknown extension \"$ext\" for \"$script\"]${RESET}"
