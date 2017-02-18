@@ -96,7 +96,7 @@ def plot_piecharts(df, fname_base):
     """
     fname_result = fname_base.rstrip('/') + '_statistics'
 
-    print('\n> Creating plots')
+    print('\n> Creating pie charts')
     for read_name, group in df.groupby('read_name'):
         names, values = [], []
         for i, row in group.iterrows():
@@ -114,17 +114,38 @@ def plot_piecharts(df, fname_base):
         plt.savefig(os.path.join(fname_result, read_name.replace(' ', '_')) + '.pdf')
         plt.close()
 
-def main(fname):
-    df = compute_statistics(fname)
-    plot_piecharts(df, fname)
+def plot_overview(df_list):
+    """ Plot all count-fractions into one plot
+    """
+    print('\n> Creating overview plot')
+    df = pd.concat(df_list)
+
+    plt.figure()
+
+    sns.boxplot(x='reference', y='count', hue='read_name', data=df)
+    plt.title('Read-count overview')
+
+    plt.savefig('overview.pdf')
+    plt.close()
+
+
+def main(fnames):
+    df_list = []
+    for fname in fnames:
+        df = compute_statistics(fname)
+        plot_piecharts(df, fname)
+        df_list.append(df)
+
+    plot_overview(df_list)
 
 
 if __name__ == '__main__':
-    if len(sys.argv) != 2:
-        print('Usage: {} <seq. data dir>'.format(sys.argv[0]))
+    if len(sys.argv) < 2:
+        print('Usage: {} <seq. data dir> [...]'.format(sys.argv[0]))
         exit(-1)
 
     sns.set_style('white')
     plt.style.use('seaborn-poster')
 
-    main(sys.argv[1])
+
+    main(sys.argv[1:])
