@@ -137,7 +137,9 @@ def plot_overview(df_list):
     # plot result
     plt.figure()
 
-    sns.boxplot(x='reference', y='relative_count', hue='read_name', data=df)
+    ax = sns.boxplot(
+        x='reference', y='relative_count', hue='read_name', data=df)
+    ax.legend_.remove()
 
     plt.title('Read-count overview')
     plt.ylim((0, 1))
