@@ -118,12 +118,29 @@ def plot_overview(df_list):
     """ Plot all count-fractions into one plot
     """
     print('\n> Creating overview plot')
-    df = pd.concat(df_list)
 
+    # compute relative counts
+    new_df_list = []
+    for df in df_list:
+        rel_count = pd.DataFrame()
+        for _, group in df.groupby('read_name'):
+            total = group['count'].sum()
+            tmp = group['count'] / total
+            tmp.name = 'relative_count'
+            rel_count = rel_count.append(tmp.to_frame())
+
+        ndf = pd.concat([df, rel_count], axis=1)
+        new_df_list.append(ndf)
+
+    df = pd.concat(new_df_list)
+
+    # plot result
     plt.figure()
 
-    sns.boxplot(x='reference', y='count', hue='read_name', data=df)
+    sns.boxplot(x='reference', y='relative_count', hue='read_name', data=df)
+
     plt.title('Read-count overview')
+    plt.ylim((0, 1))
 
     plt.savefig('overview.pdf')
     plt.close()
