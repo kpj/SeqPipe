@@ -10,6 +10,7 @@ import subprocess
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+from matplotlib.font_manager import FontProperties
 
 from Bio import SeqIO
 from tqdm import tqdm
@@ -137,14 +138,19 @@ def plot_overview(df_list):
     # plot result
     plt.figure()
 
+    fontP = FontProperties()
+    fontP.set_size('small')
+
     ax = sns.boxplot(
         x='reference', y='relative_count', hue='read_name', data=df)
-    ax.legend_.remove()
+    lgd = ax.legend(
+        loc='upper center', prop=fontP,
+        bbox_to_anchor=(.95,.9), bbox_transform=plt.gcf().transFigure)
 
     plt.title('Read-count overview')
     plt.ylim((0, 1))
 
-    plt.savefig('overview.pdf')
+    plt.savefig('overview.pdf', bbox_extra_artists=(lgd,), bbox_inches='tight')
     plt.close()
 
 
