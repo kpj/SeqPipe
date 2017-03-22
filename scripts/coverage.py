@@ -87,7 +87,7 @@ def annotate_with_gff(references, gff_fname, pattern):
         print(' >', ref, len(data[ref]))
     return data
 
-def annotate_peak_positions(references, df_cov, depth_thres=1e4):
+def annotate_peak_positions(references, df_cov, depth_thres_frac=.5):
     """
     Annotate peaks with exact bp positions.
 
@@ -100,15 +100,18 @@ def annotate_peak_positions(references, df_cov, depth_thres=1e4):
             Threshold on how many reads constitute a peak
     """
     data = {}
-    print('Threshold:', depth_thres)
     for ref in references:
-        df = df_cov[(df_cov.reference == ref) & (df_cov.depth > depth_thres)]
+        df = df_cov[df_cov.reference == ref]
+        max_depth = df['depth'].max()
+        depth_thres = max_depth * depth_thres_frac
+        print(f'[{ref}] Threshold: {depth_thres} ({depth_thres_frac} * {max_depth})')
+        sub = df[df.depth > depth_thres]
 
         data[ref] = []
         start = None
         cur = None
         strand = None
-        for index, row in df.iterrows():
+        for index, row in sub.iterrows():
             if start is None:
                 start = row.position
                 cur = start
