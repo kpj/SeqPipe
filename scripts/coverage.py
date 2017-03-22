@@ -185,7 +185,9 @@ def annotate_read_pattern(
             score = bases[best_base] / total_count
 
             enriched_bases += best_base
-            score_string += str(int(abs(score * 10) % 10))
+
+            cur = str(int(abs(score * 10) % 10))
+            score_string += '\u2714' if cur == '0' else cur
 
         return enriched_bases, score_string
 
