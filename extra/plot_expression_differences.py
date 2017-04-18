@@ -10,7 +10,7 @@ import collections
 import pysam
 import numpy as np
 
-import seaborn
+import seaborn as sns
 import matplotlib.pyplot as plt
 
 from tqdm import tqdm
@@ -74,6 +74,7 @@ def plot_result(cov_data):
 
         plt.figure()
 
+        # individual plots
         plt.subplot(311)
         plt.plot(cov1)
         plt.title(read1)
@@ -89,8 +90,16 @@ def plot_result(cov_data):
         plt.title(read2)
         plt.ylim((0,max_cov))
 
+        # surrounding graphics
         plt.suptitle(f'Stage: {stage}, reference: {ref}')
 
+        with sns.axes_style('white'):
+            plt.gcf().add_subplot(111, frameon=False)
+            plt.tick_params(labelcolor='none', top='off', bottom='off', left='off', right='off')
+            plt.xlabel('base position')
+            plt.ylabel('base coverage')
+
+        # save result
         plt.tight_layout()
         plt.subplots_adjust(top=0.85)
         plt.savefig(f'images/diffexpr_{stage}_{ref}_{read1}_{read2}.pdf')
