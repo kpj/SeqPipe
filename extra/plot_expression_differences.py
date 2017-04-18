@@ -35,8 +35,11 @@ def gather_files(stage_dir):
             samfile = pysam.AlignmentFile(aligned_bam_file, 'rb')
             assert samfile.has_index()
 
+            with open(os.path.join(stage_entry.path, 'info.txt')) as fd:
+                stage = fd.read().strip()
+
             result.append({
-                'stage': stage_entry.name,
+                'stage': stage,
                 'read': read_entry.name,
                 'sam': samfile
             })
