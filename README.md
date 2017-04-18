@@ -20,6 +20,8 @@ Additional useful scripts are contained in `extra`.
   * map length-filtered reads against multiple genomes in succession
 * `plot_sequential_data.py`
   * visualize data obtained from sequential pipeline
+* `plot_expression_differences.py`
+  * visualize differences in RNAseq expression levels over pairs of samples
 
 ## Dependencies
 
@@ -41,3 +43,4 @@ Languages:
   * matplotlib
   * tqdm
   * biopython
+  * pysam
