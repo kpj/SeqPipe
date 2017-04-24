@@ -49,7 +49,7 @@ def compute_coverage(alig_data):
     """ Compute per-base coverage
     """
     result = []
-    for entry in alig_data:
+    for entry in tqdm(alig_data):
         sam = entry['sam']
         tmp = {}
         for ref, slen in zip(sam.references, sam.lengths):
