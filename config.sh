@@ -6,7 +6,7 @@ ts=$(date +"%Y-%m-%d_%H-%M-%S")
 export default_output_dir="mapping_result_${ts}"
 
 export read_min_len=0
-export read_max_len=100
+export read_max_len=99999999999
 
 ## per analysis options
 export reads_file="reads.fastq"

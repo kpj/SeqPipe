@@ -14,11 +14,11 @@ inp_genome_file=
 output_dir="$default_output_dir"
 
 usage() {
-    echo "Usage: $0 -i <path to read (directory)> -g <path to reference genome file> [-o <output directory>]"
+    echo "Usage: $0 -i <path to read (directory)> -g <path to reference genome file> [-o <output directory>] [-m <min read len>] [-M <max read len>]"
     exit 1
 }
 
-while getopts ":i:g:o:" opt; do
+while getopts ":i:g:o:m:M:" opt; do
     case "${opt}" in
         i)
             inp_read=${OPTARG}
@@ -28,6 +28,12 @@ while getopts ":i:g:o:" opt; do
             ;;
         o)
             output_dir=${OPTARG}
+            ;;
+        m)
+            read_min_len=${OPTARG}
+            ;;
+        M)
+            read_max_len=${OPTARG}
             ;;
         *)
             usage
