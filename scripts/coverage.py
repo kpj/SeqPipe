@@ -72,7 +72,7 @@ def annotate_with_gff(references, gff_fname, pattern):
 
     # process data
     data = {}
-    print('Pattern: "{}"'.format(pattern))
+    print(f'Pattern: "{pattern}"')
     for ref in references:
         df = df_gff[(df_gff.seqid == ref) & df_gff.attributes.str.contains(pattern)]
 
@@ -123,7 +123,7 @@ def annotate_peak_positions(references, df_cov, depth_thres_frac=.5):
                     data[ref].append({
                         'start': start,
                         'end': cur,
-                        'name': '{}.\n.{}'.format(start, cur),
+                        'name': f'{start}.\n.{cur}',
                         'strand': strand
                     })
 
@@ -135,7 +135,7 @@ def annotate_peak_positions(references, df_cov, depth_thres_frac=.5):
             data[ref].append({
                 'start': start,
                 'end': cur,
-                'name': '{}.\n.{}'.format(start, cur),
+                'name': f'{start}.\n.{cur}',
                 'strand': strand
             })
 
@@ -162,8 +162,7 @@ def annotate_read_pattern(
     def get_reads(ref, start, end):
         sequences = []
         with tempfile.NamedTemporaryFile(suffix='sam') as tf:
-            os.system('samtools view -o {} {} {}:{}-{}'.format(
-                tf.name, bam_fname, ref, start, end))
+            os.system(f'samtools view -o {tf.name} {bam_fname} {ref}:{start}-{end}')
 
             for line in tf:
                 parts = line.split()
@@ -207,10 +206,9 @@ def annotate_read_pattern(
             base_freqs = compute_base_enrichment(reads)
 
             ebases, score = extract_enriched_bases(base_freqs)
-            pos_range = '{}{}{}'.format(
-                start, ' '*(len(ebases)-len(str(start))-len(str(end))), end)
+            pos_range = f'{start}{" "*(len(ebases)-len(str(start))-len(str(end)))}{end}'
 
-            annotation = '{}\n{}\n{}'.format(pos_range, ebases, score)
+            annotation = f'{pos_range}\n{ebases}\n{score}'
             data[ref].append({
                 'start': start,
                 'end': end,
@@ -218,7 +216,7 @@ def annotate_read_pattern(
             })
 
             with open(cache_fname, 'a') as fd:
-                fd.write('{} strand\n'.format(peak['strand']) + annotation + '\n\n')
+                fd.write(f'{peak["strand"]} strand\n' + annotation + '\n\n')
     return data
 
 def file_checks(base_fname, two_strands=True):
@@ -228,17 +226,17 @@ def file_checks(base_fname, two_strands=True):
     Arguments
         *similar to main*
     """
-    coverage_fname = '{}.cov'.format(base_fname)
-    bam_fname = '{}.bam'.format(base_fname)
+    coverage_fname = f'{base_fname}.cov'
+    bam_fname = f'{base_fname}.bam'
 
     assert os.path.isfile(bam_fname), bam_fname
 
     # check that required files are available
-    bam_index_fname = '{}.bai'.format(bam_fname)
+    bam_index_fname = f'{bam_fname}.bai'
     if not os.path.isfile(bam_index_fname):
         print('No bam index found, generating one...')
-        cmd = 'samtools index {inp}'.format(inp=bam_fname)
-        print(' > "{}"...'.format(cmd), end=' ', flush=True)
+        cmd = f'samtools index {bam_fname}'
+        print(f' > "{cmd}"...', end=' ', flush=True)
         os.system(cmd)
         print('Done')
     else:
@@ -246,33 +244,33 @@ def file_checks(base_fname, two_strands=True):
 
     if not os.path.isfile(coverage_fname):
         if two_strands:
-            bam_p = '{}_pstrand.bam'.format(base_fname)
-            bam_m = '{}_mstrand.bam'.format(base_fname)
+            bam_p = f'{base_fname}_pstrand.bam'
+            bam_m = f'{base_fname}_mstrand.bam'
 
-            cov_p = '{}_pstrand.cov'.format(base_fname)
-            cov_m = '{}_mstrand.cov'.format(base_fname)
+            cov_p = f'{base_fname}_pstrand.cov'
+            cov_m = f'{base_fname}_mstrand.cov'
 
             cmds = [
-                'samtools view -F 16 {inp} -b > {outp}'.format(inp=bam_fname, outp=bam_p),
-                'samtools view -f 16 {inp} -b > {outp}'.format(inp=bam_fname, outp=bam_m),
+                f'samtools view -F 16 {bam_fname} -b > {bam_p}',
+                f'samtools view -f 16 {bam_fname} -b > {bam_m}',
 
-                'genomeCoverageBed -ibam {inp} -d > {outp}'.format(inp=bam_p, outp=cov_p),
-                'genomeCoverageBed -ibam {inp} -d > {outp}'.format(inp=bam_m, outp=cov_m),
+                f'genomeCoverageBed -ibam {bam_p} -d > {cov_p}',
+                f'genomeCoverageBed -ibam {bam_m} -d > {cov_m}',
 
-                'sed -e "s/$/\t+/" -i {fname}'.format(fname=cov_p),
-                'sed -e "s/$/\t-/" -i {fname}'.format(fname=cov_m),
+                f'sed -e "s/$/\t+/" -i {cov_p}',
+                f'sed -e "s/$/\t-/" -i {cov_m}',
 
-                'cat {inp1} {inp2} > {outp}'.format(inp1=cov_p, inp2=cov_m, outp=coverage_fname)
+                f'cat {cov_p} {cov_m} > {coverage_fname}'
             ]
         else:
             cmds = [
-                'genomeCoverageBed -ibam {inp} -d > {outp}'.format(inp=bam_fname, outp=coverage_fname),
-                'sed -e "s/$/\t+-/" -i {fname}'.format(fname=coverage_fname)
+                f'genomeCoverageBed -ibam {bam_fname} -d > {coverage_fname}',
+                f'sed -e "s/$/\t+-/" -i {coverage_fname}'
             ]
 
         print('No coverage file found, generating one...')
         for cmd in cmds:
-            print(' > "{}"...'.format(cmd), end=' ', flush=True)
+            print(f' > "{cmd}"...', end=' ', flush=True)
             ret_code = os.system(cmd)
             print('Done' if ret_code == 0 else 'Fail')
     else:
@@ -293,7 +291,9 @@ def main(base_fname):
 
     # get data
     print('Reading data...', end=' ', flush=True)
-    df_cov = pd.read_table(coverage_fname, header=None, names=['reference', 'position', 'depth', 'strand'])
+    df_cov = pd.read_table(
+        coverage_fname,
+        header=None, names=['reference', 'position', 'depth', 'strand'])
     df_cov.position = df_cov.position.astype(int)
     df_cov.depth = df_cov.depth.astype(int)
 
@@ -354,7 +354,7 @@ def main(base_fname):
                 arrowprops=dict(arrowstyle='->'),
                 fontsize=3, fontproperties=font)
 
-        plt.title('{} (total base hits: {})'.format(ref, read_num))
+        plt.title(f'{ref} (total base hits: {read_num})')
         plt.xlabel('bp position')
         plt.ylabel('read count')
 
@@ -362,11 +362,11 @@ def main(base_fname):
         plt.legend(loc='best')
 
         plt.tight_layout()
-        fig.savefig('results/coverage_{}.pdf'.format(ref))
+        fig.savefig(f'results/coverage_{ref}.pdf')
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
-        print('Usage: {} <bam without prefix>'.format(sys.argv[0]))
+        print(f'Usage: {sys.argv[0]} <bam without prefix>')
         exit(-1)
 
     main(sys.argv[1])
