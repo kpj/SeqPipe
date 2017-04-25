@@ -83,6 +83,7 @@ if [[ ! -f "$sam" ]]; then
     echo -ne "${BACKGROUND}"
     bowtie2 \
         --very-sensitive \
+        -a \
         -x "$genome" \
         -U "$tmp_reads_file" \
         -S "$sam" \
