@@ -5,20 +5,42 @@
 set -e
 set -u
 
-
-if [[ $# -ne 2 && $# -ne 3 ]]; then
-    echo "Usage: $0 <path to read (directory)> <path to reference genome file> [output directory]"
-    exit
-fi
-
 cur_wd="$(dirname "$0")"
-inp_read="$1"
-inp_genome_file="$2"
-
 . "$cur_wd/config.sh"
 
+# handle cmdline-arguments
+inp_read=
+inp_genome_file=
+output_dir="$default_output_dir"
+
+usage() {
+    echo "Usage: $0 -i <path to read (directory)> -g <path to reference genome file> [-o <output directory>]"
+    exit 1
+}
+
+while getopts ":i:g:o:" opt; do
+    case "${opt}" in
+        i)
+            inp_read=${OPTARG}
+            ;;
+        g)
+            inp_genome_file=${OPTARG}
+            ;;
+        o)
+            output_dir=${OPTARG}
+            ;;
+        *)
+            usage
+            ;;
+    esac
+done
+shift $((OPTIND-1))
+
+if [ -z "${inp_read}" ] || [ -z "${inp_genome_file}" ] || [ -z "${output_dir}" ]; then
+    usage
+fi
+
 # process reads
-output_dir="${3:-$default_output_dir}"
 mkdir -p "$output_dir"
 
 for file in $(find "$inp_read" \( -name "*.fastq.gz" -o -name "*.fastq" \)); do
