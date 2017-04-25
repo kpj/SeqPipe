@@ -40,7 +40,7 @@ fi
 ## begin of pipeline
 
 # extract reads of specified length
-echo "Filter fastq ($read_min_len < |seq| < $read_max_len)"
+echo "Filter fastq ($read_min_len <= |seq| <= $read_max_len)"
 echo -ne "${BACKGROUND}"
 cutadapt \
     -m $read_min_len \
