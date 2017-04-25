@@ -3,24 +3,24 @@
 
 ## pipeline options
 ts=$(date +"%Y-%m-%d_%H-%M-%S")
-default_output_dir="mapping_result_${ts}"
+export default_output_dir="mapping_result_${ts}"
 
-read_min_len=0
-read_max_len=100
+export read_min_len=0
+export read_max_len=100
 
 ## per analysis options
-reads_file="reads.fastq"
-genome_file="genome.fa"
-log_file="log.txt"
+export reads_file="reads.fastq"
+export genome_file="genome.fa"
+export log_file="log.txt"
 
-data_dir="data/"
-result_dir="results/"
-fastqc_dir="fastqc/"
+export data_dir="data/"
+export result_dir="results/"
+export fastqc_dir="fastqc/"
 
 ## internal helpers
-SUCCESS="\033[32m"
-WARNING="\033[33m"
-ERROR="\033[31m"
-BACKGROUND="\033[90m"
-INFO="\033[36m"
-RESET="\033[0m"
+export SUCCESS="\033[32m"
+export WARNING="\033[33m"
+export ERROR="\033[31m"
+export BACKGROUND="\033[90m"
+export INFO="\033[36m"
+export RESET="\033[0m"
