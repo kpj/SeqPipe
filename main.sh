@@ -75,7 +75,7 @@ done
 # gather results
 if [[ ! -d "$output_dir/runs/" ]]; then
     echo "No results were generated..."
-    exit -1
+    exit 1
 fi
 
 res_dir="$output_dir/results"
