@@ -4,7 +4,9 @@
 
 Execute `main.sh` as follows:
 ```bash
-$ ./main.sh <path to read directory/read itself> <path to reference genome file>
+$ ./main.sh \
+    -i <path to read (directory)> -g <path to reference genome file> \
+    [-o <output directory>] [-m <min read len>] [-M <max read len>]
 ```
 This will create a `mapping_results` directory which contains two directories:
 * `runs` stores all data related to each individual read file
