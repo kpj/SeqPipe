@@ -24,6 +24,8 @@ Additional useful scripts are contained in `extra`.
   * visualize data obtained from sequential pipeline
 * `plot_expression_differences.py`
   * visualize differences in RNAseq expression levels over pairs of samples
+* `utils.py`
+  * Various helper methods
 
 ## Dependencies
 
@@ -46,3 +48,4 @@ Languages:
   * tqdm
   * biopython
   * pysam
+  * joblib
