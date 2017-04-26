@@ -49,6 +49,17 @@ fi
 # process reads
 mkdir -p "$output_dir"
 
+# store meta information
+cat > "$output_dir/$meta_info_file" <<EOF
+{
+    "reference": "$(basename $inp_genome_file)",
+    "config": {
+        "min_read_len": $read_min_len,
+        "max_read_len": $read_max_len
+    }
+}
+EOF
+
 for file in $(find "$inp_read" \( -name "*.fastq.gz" -o -name "*.fastq" \)); do
     # book-keeping
     fname=$(basename $file)

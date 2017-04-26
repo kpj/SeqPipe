@@ -9,6 +9,8 @@ export read_min_len=0
 export read_max_len=99999999999
 
 ## per analysis options
+export meta_info_file="info.json"
+
 export reads_file="reads.fastq"
 export genome_file="genome.fa"
 export log_file="log.txt"
