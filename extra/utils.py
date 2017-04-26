@@ -16,18 +16,15 @@ from joblib import Parallel, delayed, cpu_count
 def count_fastq_sequences(fname):
     """ Count entries in given FASTQ file
     """
-    #records = SeqIO.parse(os.path.join(path, fname), 'fastq')
+    #records = SeqIO.parse(fname, 'fastq')
     #return len(list(records))
 
     # hacky (but faster) way to count sequences in fastq
-    if os.path.getsize(fname) == 0:
-        return 0
-
-    cproc = subprocess.run(
-        ['grep', '-c', '^@', fname],
-        check=True, stdout=subprocess.PIPE)
-    res = cproc.stdout.decode('utf-8').rstrip()
-    return int(res)
+    out = subprocess.Popen(
+        ['wc', '-l', fname],
+        stdout=subprocess.PIPE, stderr=subprocess.STDOUT
+    ).communicate()[0]
+    return int(int(out.partition(b' ')[0]) / 4)
 
 def count_bam_reads(fname):
     """ Count number of reads in given BAM file
