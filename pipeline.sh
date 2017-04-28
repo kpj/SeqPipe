@@ -60,6 +60,8 @@ if [[ ! -d "$fastqc_dir" ]]; then
         "$tmp_reads_file" \
     |& tee -a "$log_file"
     echo -ne "${RESET}"
+else
+    echo "Use existing FastQC result"
 fi
 
 # generate genome if needed
