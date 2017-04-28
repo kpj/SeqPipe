@@ -98,7 +98,11 @@ for dir in "$output_dir/runs/"*; do
     echo " > $id"
     mkdir -p "$res_dir/$id/"
     for res in "$dir/results/"*; do
-        echo "  - $res"
-        cp "$res" "$res_dir/$id/"
+        if [[ -e "$res" ]]; then
+            echo "  - $res"
+            cp "$res" "$res_dir/$id/"
+        else
+            echo "  -- no results found --"
+        fi
     done
 done
