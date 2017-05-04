@@ -56,13 +56,16 @@ if [[ ! -d "$fastqc_dir" ]]; then
     mkdir -p "$fastqc_dir"
 
     echo -ne "${BACKGROUND}"
+    FASTQC_START_TIME=$SECONDS
     fastqc \
         --outdir="$fastqc_dir" \
         "$tmp_reads_file" \
     |& tee -a "$log_file"
+    FASTQC_ELAPSED_TIME=$(($SECONDS - $FASTQC_START_TIME))
     echo -ne "${RESET}"
 else
     echo "Use existing FastQC result"
+    FASTQC_ELAPSED_TIME=0
 fi
 
 # generate genome if needed
@@ -71,11 +74,14 @@ if [[ ! -d "$(dirname "$genome")" ]]; then
     mkdir genome
 
     echo -ne "${BACKGROUND}"
+    BOWTIEBUILD_START_TIME=$SECONDS
     bowtie2-build "./input/$genome_file" "$genome" > /dev/null
+    BOWTIEBUILD_ELAPSED_TIME=$(($SECONDS - $BOWTIEBUILD_START_TIME))
     echo -ne "${RESET}"
     echo "[bowtie2-build stdout truncated]" >> "$log_file"
 else
     echo "Use existing genome"
+    BOWTIEBUILD_ELAPSED_TIME=0
 fi
 
 # map reads
@@ -83,21 +89,25 @@ if [[ ! -f "$sam" ]]; then
     echo "Generate mapping"
 
     echo -ne "${BACKGROUND}"
+    BOWTIE_START_TIME=$SECONDS
     bowtie2 \
         --very-sensitive \
         -x "$genome" \
         -U "$tmp_reads_file" \
         -S "$sam" \
     |& tee -a "$log_file"
+    BOWTIE_ELAPSED_TIME=$(($SECONDS - $BOWTIE_START_TIME))
     echo -ne "${RESET}"
 
     echo "Convert sam to bam"
     samtools view -b "$sam" > "$bam"
 else
     echo "Use existing mapping"
+    BOWTIE_ELAPSED_TIME=0
 fi
 
 ## post-process bam
+BAM_START_TIME=$SECONDS
 # sort bam into different directory
 echo "Sort bam"
 samtools sort -o "$data_dir/sorted.bam" "$bam"
@@ -106,11 +116,13 @@ samtools sort -o "$data_dir/sorted.bam" "$bam"
 echo "Generating additional data"
 samtools view -F 4 -b -o "aligned_reads.bam" "$data_dir/sorted.bam"
 samtools view -f 4 -b -o "not_aligned_reads.bam" "$data_dir/sorted.bam"
+BAM_ELAPSED_TIME=$(($SECONDS - $BAM_START_TIME))
 
 # (re)create results using scripts
 rm -rf "$result_dir"
 mkdir -p "$result_dir"
 
+SCRIPT_START_TIME=$SECONDS
 for script in "./scripts/"*; do
     ext="${script##*.}"
     if [ "$ext" == "py" ]; then
@@ -129,3 +141,16 @@ for script in "./scripts/"*; do
         echo -e "${WARNING}[Unknown extension \"$ext\" for \"$script\"]${RESET}"
     fi
 done
+SCRIPT_ELAPSED_TIME=$(($SECONDS - $SCRIPT_START_TIME))
+
+# print timing information
+print_seconds() {
+    printf '%02dh:%02dm:%02ds\n' $(($1/3600)) $(($1%3600/60)) $(($1%60))
+}
+
+echo "Runtime statistics" |& tee -a "$log_file"
+echo " > fastQC: $(print_seconds $FASTQC_ELAPSED_TIME)" |& tee -a "$log_file"
+echo " > bowtie-build: $(print_seconds $BOWTIEBUILD_ELAPSED_TIME)" |& tee -a "$log_file"
+echo " > bowtie: $(print_seconds $BOWTIE_ELAPSED_TIME)" |& tee -a "$log_file"
+echo " > BAM conversions: $(print_seconds $BAM_ELAPSED_TIME)" |& tee -a "$log_file"
+echo " > scripts: $(print_seconds $SCRIPT_ELAPSED_TIME)" |& tee -a "$log_file"
