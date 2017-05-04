@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 ########
 # Script to set up individual containers for each alignment process
 #

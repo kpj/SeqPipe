@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 ########
 # Script to execute pipeline on specified set of data
 #

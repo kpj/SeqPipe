@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 ########
 # Script to align reads against many genomes in succession
 # Genome directory should have the following structure:

@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 #########
 # General variable definitions
 
