@@ -42,12 +42,14 @@ fi
 # extract reads of specified length
 echo "Filter fastq ($read_min_len <= |seq| <= $read_max_len)"
 echo -ne "${BACKGROUND}"
+CUTADAPT_START_TIME=$SECONDS
 cutadapt \
     -m $read_min_len \
     -M $read_max_len \
     "./input/$reads_file" \
     -o "$tmp_reads_file" \
 |& tee -a "$log_file"
+CUTADAPT_ELAPSED_TIME=$(($SECONDS - $CUTADAPT_START_TIME))
 echo -ne "${RESET}"
 
 # quality assessment
@@ -149,6 +151,7 @@ print_seconds() {
 }
 
 echo "Runtime statistics" |& tee -a "$log_file"
+echo " > cutadapt: $(print_seconds $CUTADAPT_ELAPSED_TIME)" |& tee -a "$log_file"
 echo " > fastQC: $(print_seconds $FASTQC_ELAPSED_TIME)" |& tee -a "$log_file"
 echo " > bowtie-build: $(print_seconds $BOWTIEBUILD_ELAPSED_TIME)" |& tee -a "$log_file"
 echo " > bowtie: $(print_seconds $BOWTIE_ELAPSED_TIME)" |& tee -a "$log_file"
