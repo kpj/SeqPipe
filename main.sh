@@ -60,7 +60,10 @@ cat > "$output_dir/$meta_info_file" <<EOF
 }
 EOF
 
-for file in $(find "$inp_read" \( -name "*.fastq.gz" -o -name "*.fastq" \)); do
+# parallelized pipeline runs
+run() {
+    file="$1"
+
     # book-keeping
     fname=$(basename $file)
     echo -ne "${INFO}" ">> Handling \"$fname\" <<" "${RESET}\n"
@@ -80,8 +83,14 @@ for file in $(find "$inp_read" \( -name "*.fastq.gz" -o -name "*.fastq" \)); do
 
     # start analysis
     "$cur_wd/pipeline.sh" "$analysis_wd"
+}
+
+for file in $(find "$inp_read" \( -name "*.fastq.gz" -o -name "*.fastq" \)); do
+    run "$file" &
 done
 
+# wait for all pipelines to finish
+wait
 
 # gather results
 if [[ ! -d "$output_dir/runs/" ]]; then
