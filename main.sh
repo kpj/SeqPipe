@@ -19,7 +19,7 @@ usage() {
     exit 1
 }
 
-while getopts ":i:g:o:m:M:n" opt; do
+while getopts ":i:g:o:m:M:np" opt; do
     case "${opt}" in
         i)
             inp_read=${OPTARG}
@@ -38,6 +38,9 @@ while getopts ":i:g:o:m:M:n" opt; do
             ;;
         n)
             disable_scripts=true
+            ;;
+        p)
+            show_prefix=true
             ;;
         *)
             usage
@@ -90,7 +93,13 @@ run() {
 }
 
 for file in $(find "$inp_read" \( -name "*.fastq.gz" -o -name "*.fastq" \)); do
-    run "$file" &
+    if [[ "$show_prefix" = true ]] ; then
+        app="$(basename $file)|$(basename $inp_genome_file)"
+    else
+        app=""
+    fi
+
+    run "$file" | ts "$app" &
 done
 
 # wait for all pipelines to finish

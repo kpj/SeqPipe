@@ -6,7 +6,7 @@ Execute `main.sh` as follows:
 ```bash
 $ ./main.sh \
     -i <path to read (directory)> -g <path to reference genome file> \
-    [-o <output directory>] [-m <min read len>] [-M <max read len>]
+    [-o <output directory>] [-m <min read len>] [-M <max read len>] [-n] [-p]
 ```
 This will create a `mapping_results` directory which contains two directories:
 * `runs` stores all data related to each individual read file
@@ -37,6 +37,7 @@ Tools:
 * samtools
   * [specifications](https://samtools.github.io/hts-specs/SAMv1.pdf)
 * bedtools
+* moreutils
 
 Languages:
 * bash
