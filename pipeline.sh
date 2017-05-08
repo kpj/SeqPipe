@@ -125,24 +125,28 @@ rm -rf "$result_dir"
 mkdir -p "$result_dir"
 
 SCRIPT_START_TIME=$SECONDS
-for script in "./scripts/"*; do
-    ext="${script##*.}"
-    if [ "$ext" == "py" ]; then
-        echo -e "${SUCCESS}[Executing python script \"$script\"]${RESET}"
+if [[ ! "$disable_scripts" = true ]] ; then
+    for script in "./scripts/"*; do
+        ext="${script##*.}"
+        if [ "$ext" == "py" ]; then
+            echo -e "${SUCCESS}[Executing python script \"$script\"]${RESET}"
 
-        echo -ne "${BACKGROUND}"
-        python "$script" "$data_dir/sorted" |& tee -a "$log_file"
-        echo -ne "${RESET}"
-    elif [ "$ext" == "sh" ]; then
-        echo -e "${SUCCESS}[Executing shell script \"$script\"]${RESET}"
+            echo -ne "${BACKGROUND}"
+            python "$script" "$data_dir/sorted" |& tee -a "$log_file"
+            echo -ne "${RESET}"
+        elif [ "$ext" == "sh" ]; then
+            echo -e "${SUCCESS}[Executing shell script \"$script\"]${RESET}"
 
-        echo -ne "${BACKGROUND}"
-        "$script" "$data_dir/sorted" |& tee -a "$log_file"
-        echo -ne "${RESET}"
-    else
-        echo -e "${WARNING}[Unknown extension \"$ext\" for \"$script\"]${RESET}"
-    fi
-done
+            echo -ne "${BACKGROUND}"
+            "$script" "$data_dir/sorted" |& tee -a "$log_file"
+            echo -ne "${RESET}"
+        else
+            echo -e "${WARNING}[Unknown extension \"$ext\" for \"$script\"]${RESET}"
+        fi
+    done
+else
+    echo "Skipping script execution" |& tee -a "$log_file"
+fi
 SCRIPT_ELAPSED_TIME=$(($SECONDS - $SCRIPT_START_TIME))
 
 # print timing information

@@ -9,6 +9,8 @@ export default_output_dir="mapping_result_${ts}"
 export read_min_len=0
 export read_max_len=99999999999
 
+export disable_scripts=false
+
 ## per analysis options
 export meta_info_file="info.json"
 
