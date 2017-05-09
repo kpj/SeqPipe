@@ -99,7 +99,7 @@ for file in $(find "$inp_read" \( -name "*.fastq.gz" -o -name "*.fastq" \)); do
         app=""
     fi
 
-    run "$file" | ts "$app" &
+    run "$file" |& ts "$app" &
 done
 
 # wait for all pipelines to finish
