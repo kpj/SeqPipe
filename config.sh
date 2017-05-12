@@ -8,6 +8,7 @@ export default_output_dir="mapping_result_${ts}"
 
 export read_min_len=0
 export read_max_len=99999999999
+export bowtie_params="--very-sensitive"
 
 export disable_scripts=false
 export show_prefix=false

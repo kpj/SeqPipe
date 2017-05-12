@@ -93,7 +93,7 @@ if [[ ! -f "$sam" ]]; then
     echo -ne "${BACKGROUND}"
     BOWTIE_START_TIME=$SECONDS
     bowtie2 \
-        --very-sensitive \
+        $bowtie_params \
         -x "$genome" \
         -U "$tmp_reads_file" \
         -S "$sam" \

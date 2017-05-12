@@ -15,11 +15,11 @@ inp_genome_file=
 output_dir="$default_output_dir"
 
 usage() {
-    echo "Usage: $0 -i <path to read (directory)> -g <path to reference genome file> [-o <output directory>] [-m <min read len>] [-M <max read len>] [-n]"
+    echo "Usage: $0 -i <path to read (directory)> -g <path to reference genome file> [-o <output directory>] [-m <min read len>] [-M <max read len>] [-n] [-b <bowtie arguments>]"
     exit 1
 }
 
-while getopts ":i:g:o:m:M:np" opt; do
+while getopts ":i:g:o:m:M:npb:" opt; do
     case "${opt}" in
         i)
             inp_read=${OPTARG}
@@ -36,6 +36,9 @@ while getopts ":i:g:o:m:M:np" opt; do
         M)
             read_max_len=${OPTARG}
             ;;
+        b)
+            bowtie_params=${OPTARG}
+            ;;
         n)
             disable_scripts=true
             ;;
@@ -49,7 +52,7 @@ while getopts ":i:g:o:m:M:np" opt; do
 done
 shift $((OPTIND-1))
 
-if [ -z "${inp_read}" ] || [ -z "${inp_genome_file}" ] || [ -z "${output_dir}" ]; then
+if [ -z "${inp_read}" ] || [ -z "${inp_genome_file}" ] || [ -z "${output_dir}" ] || [ -z "${bowtie_params}" ]; then
     usage
 fi
 
@@ -62,7 +65,8 @@ cat > "$output_dir/$meta_info_file" <<EOF
     "reference": "$(basename $inp_genome_file)",
     "config": {
         "min_read_len": $read_min_len,
-        "max_read_len": $read_max_len
+        "max_read_len": $read_max_len,
+        "bowtie_params": "$bowtie_params"
     }
 }
 EOF
