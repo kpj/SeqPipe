@@ -38,7 +38,8 @@ def count_bam_reads(fname):
 def parse_single_mapping_result(fname_base):
     """ Compute read-count statistics
     """
-    fname_result = 'statistics_' + fname_base.lstrip('/')
+    dir_pref = os.path.dirname(fname_base) or '.'
+    fname_result = dir_pref + '/statistics_' + os.path.basename(fname_base)
     fname_cache = os.path.join(fname_result, 'stats.csv')
 
     if os.path.exists(fname_cache):
