@@ -78,7 +78,7 @@ def compute_statistics(fnames):
     core_num = int(cpu_count() * 4/5)
     result = Parallel(n_jobs=core_num)(
         delayed(parse_single_mapping_result)(fn) for fn in tqdm(fnames))
-    return pd.concat(result)
+    return pd.concat(result).reset_index(drop=True)
 
 def main():
     df = compute_statistics(sys.argv[1:])
