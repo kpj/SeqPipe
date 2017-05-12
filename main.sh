@@ -52,7 +52,7 @@ while getopts ":i:g:o:m:M:npb:" opt; do
 done
 shift $((OPTIND-1))
 
-if [ -z "${inp_read}" ] || [ -z "${inp_genome_file}" ] || [ -z "${output_dir}" ] || [ -z "${bowtie_params}" ]; then
+if [ -z "${inp_read}" ] || [ -z "${inp_genome_file}" ] || [ -z "${output_dir}" ]; then
     usage
 fi
 

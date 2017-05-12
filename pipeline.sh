@@ -77,10 +77,11 @@ if [[ ! -d "$(dirname "$genome")" ]]; then
 
     echo -ne "${BACKGROUND}"
     BOWTIEBUILD_START_TIME=$SECONDS
-    bowtie2-build "./input/$genome_file" "$genome" > /dev/null
+    #bowtie2-build "./input/$genome_file" "$genome" > /dev/null
+    bowtie-build "./input/$genome_file" "$genome" > /dev/null
     BOWTIEBUILD_ELAPSED_TIME=$(($SECONDS - $BOWTIEBUILD_START_TIME))
     echo -ne "${RESET}"
-    echo "[bowtie2-build stdout truncated]" >> "$log_file"
+    echo "[bowtie-build stdout truncated]" >> "$log_file"
 else
     echo "Use existing genome"
     BOWTIEBUILD_ELAPSED_TIME=0
@@ -92,11 +93,16 @@ if [[ ! -f "$sam" ]]; then
 
     echo -ne "${BACKGROUND}"
     BOWTIE_START_TIME=$SECONDS
-    bowtie2 \
-        $bowtie_params \
-        -x "$genome" \
-        -U "$tmp_reads_file" \
-        -S "$sam" \
+    # bowtie2 \
+    #     $bowtie_params \
+    #     -x "$genome" \
+    #     -U "$tmp_reads_file" \
+    #     -S "$sam" \
+    bowtie \
+        -S $bowtie_params \
+        "$genome" \
+        "$tmp_reads_file" \
+        "$sam" \
     |& tee -a "$log_file"
     BOWTIE_ELAPSED_TIME=$(($SECONDS - $BOWTIE_START_TIME))
     echo -ne "${RESET}"
