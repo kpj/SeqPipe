@@ -9,6 +9,8 @@ import subprocess
 
 import pandas as pd
 
+import click
+import pysam
 from tqdm import tqdm
 from joblib import Parallel, delayed, cpu_count
 
@@ -35,12 +37,24 @@ def count_bam_reads(fname):
     res = cproc.stdout.decode('utf-8').rstrip()
     return int(res)
 
-def parse_single_mapping_result(fname_base):
+def count_bam_reads_per_sub(bam):
+    """ Count number of reads in given BAM file for each sub-reference
+    """
+    pysam.index(bam)
+    bamf = pysam.AlignmentFile(bam, 'rb')
+    assert bamf.has_index()
+
+    counts = {}
+    for ref in bamf.references:
+        counts[ref] = bamf.count(reference=ref)
+    return counts
+
+def parse_single_mapping_result(fname_base, split):
     """ Compute read-count statistics
     """
     dir_pref = os.path.dirname(fname_base) or '.'
     fname_result = dir_pref + '/statistics_' + os.path.basename(fname_base)
-    fname_cache = os.path.join(fname_result, 'stats.csv')
+    fname_cache = os.path.join(fname_result, f'stats_{"split" if split else "nosplit"}.csv')
 
     if os.path.exists(fname_cache):
         print('Cached', fname_cache)
@@ -57,31 +71,55 @@ def parse_single_mapping_result(fname_base):
 
     print('> Getting counts for each input read-file')
     for read_entry in os.scandir(os.path.join(fname_base, 'runs')):
-        mapped_count = count_bam_reads(
-            os.path.join(read_entry.path, 'aligned_reads.bam'))
-        total_count = count_fastq_sequences(
-            os.path.join(read_entry.path, 'data', 'tmp.fastq'))
+        if not split:
+            mapped_count = count_bam_reads(
+                os.path.join(read_entry.path, 'aligned_reads.bam'))
+            total_count = count_fastq_sequences(
+                os.path.join(read_entry.path, 'data', 'tmp.fastq'))
 
-        df = df.append({
-            'read_name': read_entry.name,
-            'reference': meta_info['reference'],
-            'mapped_count': mapped_count,
-            'total_count': total_count
-        }, ignore_index=True)
+            df = df.append({
+                'read_name': read_entry.name,
+                'reference': meta_info['reference'],
+                'sub_reference': None,
+                'mapped_count': mapped_count,
+                'total_count': total_count
+            }, ignore_index=True)
+        else:
+            total_count = count_fastq_sequences(
+                os.path.join(read_entry.path, 'data', 'tmp.fastq'))
+
+            bam = os.path.join(read_entry.path, 'aligned_reads.bam')
+            counts = count_bam_reads_per_sub(bam)
+
+            for sref, count in counts.items():
+                df = df.append({
+                    'read_name': read_entry.name,
+                    'reference': meta_info['reference'],
+                    'sub_reference': sref,
+                    'mapped_count': count,
+                    'total_count': total_count
+                }, ignore_index=True)
 
     df.to_csv(fname_cache)
     return df
 
-def compute_statistics(fnames):
+def compute_statistics(fnames, split=False):
     """ Aggregate statistics over all given mappings
     """
     core_num = int(cpu_count() * 4/5)
     result = Parallel(n_jobs=core_num)(
-        delayed(parse_single_mapping_result)(fn) for fn in tqdm(fnames))
+        delayed(parse_single_mapping_result)(fn, split) for fn in tqdm(fnames))
     return pd.concat(result).reset_index(drop=True)
 
-def main():
-    df = compute_statistics(sys.argv[1:])
+@click.command()
+@click.option('--split/--no-split', default=False)
+@click.argument('files', nargs=-1, type=click.Path(exists=True))
+def main(split, files):
+    if len(files) == 0:
+        print('No files provided')
+        return
+
+    df = compute_statistics(files, split=split)
     import ipdb; ipdb.set_trace()
 
 if __name__ == '__main__':

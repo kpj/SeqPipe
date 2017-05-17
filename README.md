@@ -51,3 +51,4 @@ Languages:
   * biopython
   * pysam
   * joblib
+  * click
