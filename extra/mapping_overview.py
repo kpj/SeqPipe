@@ -5,26 +5,36 @@ Generate various plots for general mapping overviews
 import os
 import sys
 
+from typing import Dict
+
+import pandas as pd
+
 import seaborn as sns
 import matplotlib.pyplot as plt
 
 from utils import compute_statistics
 
 
-def ensure_sanity():
+def ensure_sanity() -> None:
     """ Check that environment looks usable
     """
     if not os.path.isdir('images'):
         os.mkdir('images')
 
-def read_distribution(df):
+def compute_relative_counts(
+    row: pd.Series,
+    total_align_num: Dict[str, int]
+) -> pd.Series:
+    """ Compute fraction of total number of alignments
+    """
+    row['rel_count'] = row['mapped_count'] / total_align_num[row['read_name']]
+    return row
+
+def read_distribution(df: pd.DataFrame) -> None:
     """ Plot read fractions mapped to references
     """
     total_align_num = df.groupby('read_name').sum()['mapped_count'].to_dict()
-    def func(row):
-        row['rel_count'] = row['mapped_count'] / total_align_num[row['read_name']]
-        return row
-    df = df.apply(func, axis=1)
+    df = df.apply(compute_relative_counts, axis=1, args=(total_align_num,))
     df.to_csv('images/read_distribution.csv')
 
     sub = df.pivot('read_name', 'reference')['rel_count']
@@ -33,7 +43,7 @@ def read_distribution(df):
     plt.tight_layout()
     plt.savefig('images/read_distribution.pdf')
 
-def main():
+def main() -> None:
     ensure_sanity()
     df = compute_statistics(sys.argv[1:])
 
