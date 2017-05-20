@@ -20,7 +20,13 @@ def ensure_sanity():
 def read_distribution(df):
     """ Plot read fractions mapped to references
     """
-    sub = df.pivot('read_name', 'reference')['mapped_count']
+    total_align_num = df.groupby('read_name').sum()['mapped_count'].to_dict()
+    def func(row):
+        row['rel_count'] = row['mapped_count'] / total_align_num[row['read_name']]
+        return row
+    df = df.apply(func, axis=1)
+
+    sub = df.pivot('read_name', 'reference')['rel_count']
     sub.plot(kind='bar', stacked=True)
 
     plt.tight_layout()
