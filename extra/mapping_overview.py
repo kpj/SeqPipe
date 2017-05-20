@@ -25,6 +25,7 @@ def read_distribution(df):
         row['rel_count'] = row['mapped_count'] / total_align_num[row['read_name']]
         return row
     df = df.apply(func, axis=1)
+    df.to_csv('images/read_distribution.csv')
 
     sub = df.pivot('read_name', 'reference')['rel_count']
     sub.plot(kind='bar', stacked=True)
