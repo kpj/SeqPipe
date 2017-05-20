@@ -7,6 +7,8 @@ import sys
 import json
 import subprocess
 
+from typing import Sized, Dict
+
 import pandas as pd
 
 import click
@@ -15,7 +17,7 @@ from tqdm import tqdm
 from joblib import Parallel, delayed, cpu_count
 
 
-def count_fastq_sequences(fname):
+def count_fastq_sequences(fname: str) -> int:
     """ Count entries in given FASTQ file
     """
     #records = SeqIO.parse(fname, 'fastq')
@@ -28,7 +30,7 @@ def count_fastq_sequences(fname):
     ).communicate()[0]
     return int(int(out.partition(b' ')[0]) / 4)
 
-def count_bam_reads(fname):
+def count_bam_reads(fname: str) -> int:
     """ Count number of reads in given BAM file
     """
     cproc = subprocess.run(
@@ -37,7 +39,7 @@ def count_bam_reads(fname):
     res = cproc.stdout.decode('utf-8').rstrip()
     return int(res)
 
-def count_bam_reads_per_sub(bam):
+def count_bam_reads_per_sub(bam: str) -> Dict[str, int]:
     """ Count number of reads in given BAM file for each sub-reference
     """
     pysam.index(bam)
@@ -49,12 +51,13 @@ def count_bam_reads_per_sub(bam):
         counts[ref] = bamf.count(reference=ref)
     return counts
 
-def parse_single_mapping_result(fname_base, split):
+def parse_single_mapping_result(fname_base: str, split: bool) -> pd.DataFrame:
     """ Compute read-count statistics
     """
     dir_pref = os.path.dirname(fname_base) or '.'
     fname_result = dir_pref + '/statistics_' + os.path.basename(fname_base)
-    fname_cache = os.path.join(fname_result, f'stats_{"split" if split else "nosplit"}.csv')
+    fname_cache = os.path.join(
+        fname_result, f'stats_{"split" if split else "nosplit"}.csv')
 
     if os.path.exists(fname_cache):
         print('Cached', fname_cache)
@@ -103,7 +106,7 @@ def parse_single_mapping_result(fname_base, split):
     df.to_csv(fname_cache)
     return df
 
-def compute_statistics(fnames, split=False):
+def compute_statistics(fnames: Sized, split: bool = False) -> pd.DataFrame:
     """ Aggregate statistics over all given mappings
     """
     core_num = int(cpu_count() * 4/5)
@@ -114,7 +117,7 @@ def compute_statistics(fnames, split=False):
 @click.command()
 @click.option('--split/--no-split', default=False)
 @click.argument('files', nargs=-1, type=click.Path(exists=True))
-def main(split, files):
+def main(split: bool, files: Sized) -> None:
     if len(files) == 0:
         print('No files provided')
         return
