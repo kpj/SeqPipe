@@ -5,7 +5,7 @@ Generate various plots for general mapping overviews
 import os
 import sys
 
-from typing import Dict
+from typing import Dict, Sized
 
 import pandas as pd
 
@@ -43,11 +43,11 @@ def read_distribution(df: pd.DataFrame) -> None:
     plt.tight_layout()
     plt.savefig('images/read_distribution.pdf')
 
-def main() -> None:
+def main(files: Sized) -> None:
     ensure_sanity()
-    df = compute_statistics(sys.argv[1:])
+    df = compute_statistics(files)
 
     read_distribution(df)
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv[1:])
