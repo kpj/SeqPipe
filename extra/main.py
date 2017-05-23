@@ -11,12 +11,16 @@ from mapping_overview import main as plot_distribution
 
 @click.group()
 def cli() -> None:
+    """ Toolkit to analyse sequencing data
+    """
     pass
 
 @cli.command()
-@click.option('--absolute/--no-absolute', default=False)
+@click.option('--absolute/--relative', default=False, help='Plot absolute or relative mapped read counts')
 @click.argument('files', nargs=-1, type=click.Path(exists=True))
-def read_distribution(absolute: bool, files: Sized) -> None:
+def rdist(absolute: bool, files: Sized) -> None:
+    """ Plot read alignment distribution
+    """
     if len(files) == 0:
         print('No files provided')
         return
