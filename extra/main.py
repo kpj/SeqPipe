@@ -6,8 +6,6 @@ from typing import Sized
 
 import click
 
-from mapping_overview import main as plot_distribution
-
 
 @click.group()
 def cli() -> None:
@@ -25,6 +23,7 @@ def rdist(absolute: bool, files: Sized) -> None:
         print('No files provided')
         return
 
+    from mapping_overview import main as plot_distribution
     plot_distribution(files, absolute)
 
 
