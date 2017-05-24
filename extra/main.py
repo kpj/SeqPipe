@@ -14,7 +14,9 @@ def cli() -> None:
     pass
 
 @cli.command()
-@click.option('--absolute/--relative', default=False, help='Plot absolute or relative mapped read counts')
+@click.option(
+    '--absolute/--relative', default=False,
+    help='Plot absolute or relative mapped read counts')
 @click.argument('files', nargs=-1, type=click.Path(exists=True))
 def rdist(absolute: bool, files: Sized) -> None:
     """ Plot read alignment distribution
