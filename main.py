@@ -5,6 +5,7 @@ Hub for organizing all sequencing related things
 import io
 import os
 import gzip
+import json
 import shutil
 import datetime
 import itertools
@@ -159,6 +160,10 @@ def main(
 
     # commence pipelines
     param_obj = click.get_current_context().params
+
+    param_path = os.path.join(output_dir, 'info.json')
+    with open(param_path, 'w') as fd:
+        json.dump(param_obj, fd)
 
     core_num = int(cpu_count() * 4/5)
     result = Parallel(n_jobs=core_num)(
