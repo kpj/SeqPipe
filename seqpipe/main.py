@@ -43,6 +43,13 @@ def gather_files(path_list: List[str]) -> List[str]:
     # return unique paths while preserving order
     return list(collections.OrderedDict.fromkeys(out))
 
+class PipelineStream(io.StringIO):
+    """ Print and save output at the same time
+    """
+    def write(self, s):
+        print(s, end='', flush=True)
+        super().write(s)
+
 class SequencingRun:
     """ Store information regarding a single sequencing run
     """
@@ -59,7 +66,7 @@ class SequencingRun:
         self.output_dir = od
 
     def __call__(self, param_obj: Dict) -> Dict:
-        stream = io.StringIO()
+        stream = PipelineStream()
         res = pipeline(
             self.read_path, self.genome_path,
             self.output_dir, param_obj,
