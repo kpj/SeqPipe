@@ -67,6 +67,7 @@ Languages:
   * joblib
   * click
   * sh
+  * colorama
 
 ## Development notes
 

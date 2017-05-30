@@ -35,7 +35,7 @@ setup(
     packages=find_packages(exclude=['tests']),
 
     install_requires=[
-        'numpy', 'pandas', 'seaborn', 'matplotlib',
+        'numpy', 'pandas', 'seaborn', 'matplotlib', 'colorama',
         'tqdm', 'biopython', 'pysam', 'joblib', 'click', 'sh'],
     extras_require={
         'test': ['tox', 'pytest', 'coverage'],

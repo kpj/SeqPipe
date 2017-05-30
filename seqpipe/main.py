@@ -2,6 +2,7 @@
 Hub for organizing all sequencing related things
 """
 
+import re
 import io
 import os
 import gzip
@@ -15,7 +16,6 @@ from typing import List, Tuple, Dict
 
 
 import click
-from tqdm import tqdm
 from joblib import Parallel, delayed, cpu_count
 
 from .pipeline import pipeline
@@ -46,9 +46,13 @@ def gather_files(path_list: List[str]) -> List[str]:
 class PipelineStream(io.StringIO):
     """ Print and save output at the same time
     """
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.ansi_escape = re.compile(r'\x1b[^m]*m')
+
     def write(self, s):
         print(s, end='', flush=True)
-        super().write(s)
+        super().write(self.ansi_escape.sub('', s))
 
 class SequencingRun:
     """ Store information regarding a single sequencing run
@@ -187,7 +191,7 @@ def run(
 
     # commence pipelines
     results = Parallel(n_jobs=threads)(
-        delayed(run)(param_obj) for run in tqdm(run_list))
+        delayed(run)(param_obj) for run in run_list)
 
     # aggregate results
     result_dir = os.path.join(output_dir, 'results/')

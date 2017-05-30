@@ -13,7 +13,17 @@ from contextlib import contextmanager
 from typing import Union, Dict, Generator
 
 import sh
+import colorama
 
+
+colorama.init()
+COLORS = {
+    'background': colorama.Fore.BLACK + colorama.Style.BRIGHT,
+    'success': colorama.Fore.GREEN,
+    'warning': colorama.Fore.YELLOW,
+    'error': colorama.Fore.RED,
+    'reset': colorama.Style.RESET_ALL
+}
 
 @contextmanager
 def cwd(path: str) -> Generator:
@@ -34,9 +44,15 @@ def seconds2string(seconds: int) -> str:
 def execute(out_stream: Union[io.StringIO, str], cmd: sh.Command) -> int:
     """ Execute command and return various pieces of meta-information
     """
+    if not isinstance(out_stream, str):
+        print(COLORS['background'], file=out_stream, end='')
+
     start_time = time.time()
     cmd(_out=out_stream, _err_to_out=True)
     duration = round(time.time() - start_time)
+
+    if not isinstance(out_stream, str):
+        print(COLORS['reset'], file=out_stream, end='')
 
     return duration
 
@@ -117,11 +133,16 @@ def pipeline(
                     cmd = sh.Command(fn, search_paths=[script_dir]).bake(
                         os.path.splitext(bam_sorted_path)[0])
 
+                    print(COLORS['success'], file=out_stream, end='')
                     print(f'Executing "{fn}"', file=out_stream)
+                    print(COLORS['reset'], file=out_stream, end='')
+
                     with cwd(output_dir):
                         script_duration += execute(out_stream, cmd)
                 except sh.CommandNotFound:
+                    print(COLORS['warning'], file=out_stream, end='')
                     print(f'Skipping "{fn}"', file=out_stream)
+                    print(COLORS['reset'], file=out_stream, end='')
     else:
         print('Skipping script execution', file=out_stream)
 
