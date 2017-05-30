@@ -1,17 +1,12 @@
-import os
 from setuptools import setup, find_packages
 
 
-own_path = os.path.abspath(os.path.dirname(__file__))
-with open(os.path.join(own_path, 'README.md'), encoding='utf-8') as fd:
-    long_description = fd.read()
-
 setup(
     name='seqpipe',
-    version='0.0.3',
+    version='0.0.4',
 
     description='Sequencing pipeline',
-    long_description=long_description,
+    long_description_markdown_filename='README.md',
 
     url='https://github.com/kpj/SeqPipe',
 
@@ -34,6 +29,7 @@ setup(
     keywords='bioinformatics sequencing pipeline alignment mapping',
     packages=find_packages(exclude=['tests']),
 
+    setup_requires=['setuptools-markdown'],
     install_requires=[
         'numpy', 'pandas', 'seaborn', 'matplotlib', 'colorama',
         'tqdm', 'biopython', 'pysam', 'joblib', 'click', 'sh'],
