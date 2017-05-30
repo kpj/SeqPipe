@@ -7,7 +7,8 @@ Execute `main.py` as follows:
 $ python main.py --help
 Usage: main.py [OPTIONS]
 
-  Sequencing pipeline.
+  Create read-genome matrix and compute all read alignments. Subsequently,
+  apply various scripts and aggregate results.
 
 Options:
   -r, --read PATH             Path to read file/directory.  [required]

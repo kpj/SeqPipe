@@ -144,7 +144,8 @@ def main(
     min_read_len: int, max_read_len: int,
     bowtie_args: str
 ) -> None:
-    """ Sequencing pipeline.
+    """ Create read-genome matrix and compute all read alignments.
+        Subsequently, apply various scripts and aggregate results.
     """
     if len(read_path_list) == 0:
         print('No paths given...')
