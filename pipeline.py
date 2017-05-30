@@ -4,6 +4,7 @@ Handle execution of pipeline
 
 import io
 import os
+import json
 import time
 import shlex
 import datetime
@@ -142,7 +143,16 @@ def pipeline(
         f' > Script execution: {seconds2string(script_duration)}',
         file=out_stream)
 
-    return {
-        'read_name': os.path.basename(read_path),
+    # save meta-information
+    meta_info = {
+        'trimmed_read_path': trimmed_read_path,
+        'genome_base': genome_base,
+        'read_base': os.path.basename(read_path),
         'results_path': os.path.join(output_dir, 'results')
     }
+
+    meta_path = os.path.join(output_dir, 'meta.json')
+    with open(meta_path, 'w') as fd:
+        json.dump(meta_info, fd)
+
+    return meta_info

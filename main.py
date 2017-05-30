@@ -183,10 +183,11 @@ def main(
     os.makedirs(result_dir)
 
     for res in results:
-        for entry in os.scandir(res['results_path']):
-            cur_dir = os.path.join(result_dir, res['read_name'])
-            os.makedirs(cur_dir)
+        idx = f'{res["genome_base"]}___{res["read_base"]}'
+        cur_dir = os.path.join(result_dir, idx)
+        os.makedirs(cur_dir)
 
+        for entry in os.scandir(res['results_path']):
             shutil.copy(entry.path, cur_dir)
 
 

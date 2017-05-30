@@ -69,35 +69,37 @@ def parse_single_mapping_result(fname_base: str, split: bool) -> pd.DataFrame:
     # compute statistics
     df = pd.DataFrame()
 
-    with open(os.path.join(fname_base, 'info.json')) as fd:
-        meta_info = json.load(fd)
-
     print('> Getting counts for each input read-file')
     for read_entry in os.scandir(os.path.join(fname_base, 'runs')):
+        with open(os.path.join(read_entry.path, 'meta.json')) as fd:
+            cur_meta = json.load(fd)
+
         if not split:
             mapped_count = count_bam_reads(
                 os.path.join(read_entry.path, 'aligned_reads.bam'))
             total_count = count_fastq_sequences(
-                os.path.join(read_entry.path, 'data', 'tmp.fastq'))
+                os.path.join(
+                    read_entry.path, 'data', cur_meta['trimmed_read_path']))
 
             df = df.append({
-                'read_name': read_entry.name,
-                'reference': meta_info['reference'],
+                'read_name': cur_meta['read_base'],
+                'reference': cur_meta['genome_base'],
                 'sub_reference': None,
                 'mapped_count': mapped_count,
                 'total_count': total_count
             }, ignore_index=True)
         else:
             total_count = count_fastq_sequences(
-                os.path.join(read_entry.path, 'data', 'tmp.fastq'))
+                os.path.join(
+                    read_entry.path, 'data', cur_meta['trimmed_read_path']))
 
             bam = os.path.join(read_entry.path, 'aligned_reads.bam')
             counts = count_bam_reads_per_sub(bam)
 
             for sref, count in counts.items():
                 df = df.append({
-                    'read_name': read_entry.name,
-                    'reference': meta_info['reference'],
+                    'read_name': cur_meta['read_base'],
+                    'reference': cur_meta['genome_base'],
                     'sub_reference': sref,
                     'mapped_count': count,
                     'total_count': total_count
