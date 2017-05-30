@@ -48,12 +48,12 @@ def pipeline(
     """ Execute whole sequencing pipeline
     """
     # trim reads
+    trimmed_read_path = f'{os.path.splitext(read_path)[0]}_trimmed.fastq'
     if param_obj['min_read_len'] == -1 and param_obj['max_read_len'] == -1:
         print('Skipping read trimming', file=out_stream)
-        trimmed_read_path = read_path
+        os.symlink(read_path, trimmed_read_path)
         cutadapt_duration = 0
     else:
-        trimmed_read_path = f'{os.path.splitext(read_path)[0]}_trimmed.fastq'
         cutadapt = sh.cutadapt.bake(
             read_path, o=trimmed_read_path,
             m=param_obj['min_read_len'], M=param_obj['max_read_len'])
