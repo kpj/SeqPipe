@@ -150,6 +150,9 @@ def main(
     if len(genome_path_list) == 0:
         print('No genomes given...')
         exit(-1)
+    if os.path.exists(output_dir):
+        print('Output directory already exists')
+        exit(-1)
 
     # clean filenames
     read_path_list = gather_files(read_path_list)
