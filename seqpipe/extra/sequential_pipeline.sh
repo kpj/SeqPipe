@@ -17,7 +17,7 @@ cur_wd="$(dirname "$0")"
 inp_read="$1"
 inp_genome_dir="$2"
 
-. "$cur_wd/../config.sh"
+. "$cur_wd/config.sh"
 
 output_dir="${3:-sequential_results}"
 mkdir -p "$output_dir"
