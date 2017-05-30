@@ -137,13 +137,17 @@ class SequencingRun:
 @click.option(
     '--bowtie-args', '-b',
     help='Extra arguments for bowtie.')
+@click.option(
+    '--threads', '-t', default=int(cpu_count() * 4/5),
+    help='How many threads to run in.')
 def run(
     read_path_list: List[str],
     genome_path_list: List[str],
     output_dir: str,
     exec_scripts: bool,
     min_read_len: int, max_read_len: int,
-    bowtie_args: str
+    bowtie_args: str,
+    threads: int
 ) -> None:
     """ Create read-genome matrix and compute all read alignments.
         Subsequently, apply various scripts and aggregate results.
@@ -175,8 +179,7 @@ def run(
         json.dump(param_obj, fd)
 
     # commence pipelines
-    core_num = int(cpu_count() * 4/5)
-    results = Parallel(n_jobs=core_num)(
+    results = Parallel(n_jobs=threads)(
         delayed(run)(param_obj) for run in tqdm(run_list))
 
     # aggregate results

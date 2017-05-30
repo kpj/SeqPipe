@@ -5,7 +5,7 @@
 Execute `main.py` as follows:
 ```
 $ python main.py --help
-Usage: main.py [OPTIONS]
+Usage: seqpipe [OPTIONS]
 
   Create read-genome matrix and compute all read alignments. Subsequently,
   apply various scripts and aggregate results.
@@ -18,6 +18,7 @@ Options:
   -m, --min-read-len INTEGER  Minimal read length.
   -M, --max-read-len INTEGER  Maximal read length.
   -b, --bowtie-args TEXT      Extra arguments for bowtie.
+  -t, --threads INTEGER       How many threads to run in.
   --help                      Show this message and exit.
 ```
 This will create a `mapping_results_*` directory which contains two directories:
