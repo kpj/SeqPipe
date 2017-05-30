@@ -66,3 +66,10 @@ Languages:
   * joblib
   * click
   * sh
+
+## Development notes
+
+Create dev-builds with:
+```bash
+$ pip install --user -e .
+```

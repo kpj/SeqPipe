@@ -18,7 +18,7 @@ import click
 from tqdm import tqdm
 from joblib import Parallel, delayed, cpu_count
 
-from pipeline import pipeline
+from .pipeline import pipeline
 
 
 def get_timestamp() -> str:
