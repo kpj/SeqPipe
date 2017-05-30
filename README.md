@@ -73,3 +73,8 @@ Create dev-builds with:
 ```bash
 $ pip install --user -e .
 ```
+
+Run tests using:
+```bash
+$ tox
+```
