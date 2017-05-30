@@ -136,7 +136,7 @@ class SequencingRun:
 @click.option(
     '--bowtie-args', '-b',
     help='Extra arguments for bowtie.')
-def main(
+def run(
     read_path_list: List[str],
     genome_path_list: List[str],
     output_dir: str,
@@ -192,4 +192,4 @@ def main(
 
 
 if __name__ == '__main__':
-    main()
+    run()
