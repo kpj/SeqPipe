@@ -43,7 +43,7 @@ def pipeline(
     read_path: str, genome_path: str,
     output_dir: str, param_obj: Dict,
     out_stream: io.StringIO
-) -> bool:
+) -> Dict:
     """ Execute whole sequencing pipeline
     """
     # trim reads
@@ -142,4 +142,7 @@ def pipeline(
         f' > Script execution: {seconds2string(script_duration)}',
         file=out_stream)
 
-    return True
+    return {
+        'read_name': os.path.basename(read_path),
+        'results_path': os.path.join(output_dir, 'results')
+    }

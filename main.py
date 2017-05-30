@@ -57,9 +57,9 @@ class SequencingRun:
         self.genome_path = gp
         self.output_dir = od
 
-    def __call__(self, param_obj: Dict) -> None:
+    def __call__(self, param_obj: Dict) -> Dict:
         stream = io.StringIO()
-        pipeline(
+        res = pipeline(
             self.read_path, self.genome_path,
             self.output_dir, param_obj,
             stream)
@@ -70,6 +70,8 @@ class SequencingRun:
         log_path = os.path.join(self.output_dir, 'log.txt')
         with open(log_path, 'w') as fd:
             fd.write(log_value)
+
+        return res
 
     def _prepare_environment(
         self,
@@ -171,10 +173,20 @@ def main(
         json.dump(param_obj, fd)
 
     core_num = int(cpu_count() * 4/5)
-    result = Parallel(n_jobs=core_num)(
+    results = Parallel(n_jobs=core_num)(
         delayed(run)(param_obj) for run in tqdm(run_list))
 
-    print('Done!')
+    # aggregate results
+    result_dir = os.path.join(output_dir, 'results/')
+    os.makedirs(result_dir)
+
+    for res in results:
+        for entry in os.scandir(res['results_path']):
+            cur_dir = os.path.join(result_dir, res['read_name'])
+            os.makedirs(cur_dir)
+
+            shutil.copy(entry.path, cur_dir)
+
 
 if __name__ == '__main__':
     main()
