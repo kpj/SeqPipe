@@ -1,5 +1,7 @@
 # RNAseq Analysis Pipeline
 
+[![PyPI](https://img.shields.io/pypi/v/seqpipe.svg?style=flat)]()
+
 ## Usage
 
 Execute `main.py` as follows:
