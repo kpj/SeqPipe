@@ -42,6 +42,11 @@ The respective individual files are:
 * `mapping_overview.py`
   * Plot various statistics
 
+## Links
+
+* [Github](https://github.com/kpj/SeqPipe)
+* [PyPi](https://pypi.python.org/pypi/seqpipe)
+
 ## Dependencies
 
 Tools:
