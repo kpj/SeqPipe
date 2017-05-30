@@ -89,6 +89,7 @@ def pipeline(
 
     bowtiebuild = sh.bowtie_build.bake(genome_path, genome_prefix)
     bowtiebuild_duration = execute(os.devnull, bowtiebuild)
+    print('[bowtie-build stdout truncated]', file=out_stream)
 
     # map reads
     mapfile_base = os.path.join(output_dir, 'data', 'mapping')
