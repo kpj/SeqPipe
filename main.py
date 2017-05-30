@@ -166,13 +166,14 @@ def main(
     for read, genome in itertools.product(read_path_list, genome_path_list):
         run_list.append(SequencingRun(read, genome, output_dir))
 
-    # commence pipelines
+    # save meta-information
     param_obj = click.get_current_context().params
 
     param_path = os.path.join(output_dir, 'info.json')
     with open(param_path, 'w') as fd:
         json.dump(param_obj, fd)
 
+    # commence pipelines
     core_num = int(cpu_count() * 4/5)
     results = Parallel(n_jobs=core_num)(
         delayed(run)(param_obj) for run in tqdm(run_list))
