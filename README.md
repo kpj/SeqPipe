@@ -56,3 +56,4 @@ Languages:
   * pysam
   * joblib
   * click
+  * sh
