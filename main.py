@@ -83,7 +83,9 @@ class SequencingRun:
 
         read_base = os.path.basename(read_path)
         genome_base = os.path.basename(genome_path)
-        pipeline_dir = os.path.join(output_dir, f'{genome_base}___{read_base}')
+        pipeline_dir = os.path.join(
+            output_dir, 'runs',
+            f'{genome_base}___{read_base}')
 
         read_remote = os.path.join(
             pipeline_dir, 'input', os.path.splitext(read_base)[0])
