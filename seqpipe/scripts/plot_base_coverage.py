@@ -19,6 +19,9 @@ import collections
 import numpy as np
 import pandas as pd
 
+import matplotlib as mpl
+mpl.use('Agg')
+
 import seaborn as sns
 import matplotlib.pylab as plt
 import matplotlib.ticker as mtick
