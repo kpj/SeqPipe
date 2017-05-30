@@ -197,13 +197,19 @@ def run(
     result_dir = os.path.join(output_dir, 'results/')
     os.makedirs(result_dir)
 
+    print('Gathering results')
+    found_result = False
     for res in results:
         idx = f'{res["genome_base"]}___{res["read_base"]}'
         cur_dir = os.path.join(result_dir, idx)
         os.makedirs(cur_dir)
 
         for entry in os.scandir(res['results_path']):
+            print(f' - {entry.path}')
             shutil.copy(entry.path, cur_dir)
+            found_result = True
+    if not found_result:
+        print('  -- no results found --')
 
 
 if __name__ == '__main__':
