@@ -71,12 +71,53 @@ Languages:
 
 ## Development notes
 
-Create dev-builds with:
-```bash
-$ pip install --user -e .
-```
-
+### Tests
 Run tests using:
 ```bash
 $ tox
+```
+
+### Release package
+This guide assumes a properly setup `~/.pypirc`.
+
+Build package:
+```bash
+$ python setup.py sdist
+```
+
+Register it (only once):
+```bash
+$ twine register dist/seqpipe-X.Y.Z.tar.gz
+```
+
+Try installation locally:
+```bash
+$ rm -rf /tmp/seqpipe_tmp
+$ virtualenv /tmp/seqpipe_tmp
+$ /tmp/seqpipe_tmp/bin/pip install dist/seqpipe-X.Y.Z.tar.gz
+$ /tmp/seqpipe_tmp/bin/seqpipe --help
+```
+
+Try installation using test-servers:
+```bash
+$ twine upload -r test dist/seqpipe-X.Y.Z.tar.gz
+$ pip install -i https://testpypi.python.org/pypi seqpipe
+$ seqpipe --help
+```
+
+Check [testpypi-page](https://testpypi.python.org/pypi/seqpipe).
+
+Finally, install it on actual server:
+```bash
+$ twine upload dist/seqpipe-X.Y.Z.tar.gz
+$ pip install -U seqpipe
+$ seqpipe --help
+```
+
+Check actual [pypi-page](https://pypi.python.org/pypi/seqpipe).
+
+### Misc
+Create dev-builds with:
+```bash
+$ pip install --user -e .
 ```
