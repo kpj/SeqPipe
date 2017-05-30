@@ -35,7 +35,8 @@ def gather_files(path_list: List[str]) -> List[str]:
             out.append(path)
         elif os.path.isdir(path):
             for dirpath, _, filenames in os.walk(path):
-                out.extend([os.path.join(dirpath, fn) for fn in filenames])
+                out.extend([os.path.join(dirpath, fn)
+                    for fn in sorted(filenames)])
         else:
             raise RuntimeError(f'Did not understand {path}')
 
