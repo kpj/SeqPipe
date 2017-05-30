@@ -114,28 +114,28 @@ class SequencingRun:
 @click.option(
     '--read', '-r', 'read_path_list',
     multiple=True, type=click.Path(exists=True, resolve_path=True),
-    help='Path to read file/directory', required=True)
+    help='Path to read file/directory.', required=True)
 @click.option(
     '--genome', '-g', 'genome_path_list',
     multiple=True, type=click.Path(exists=True, resolve_path=True),
-    help='Path to genome file/directory', required=True)
+    help='Path to genome file/directory.', required=True)
 @click.option(
     '--output', '-o', 'output_dir',
     type=click.Path(file_okay=False, resolve_path=True),
-    help='Directory to save results to',
+    help='Directory to save results to.',
     default=f'mapping_result_{get_timestamp()}')
 @click.option(
     '--scripts/--no-scripts', 'exec_scripts', default=True,
-    help='Whether to execute scripts or not')
+    help='Whether to execute scripts or not.')
 @click.option(
     '--min-read-len', '-m', default=-1,
-    help='Minimal read length')
+    help='Minimal read length.')
 @click.option(
     '--max-read-len', '-M', default=-1,
-    help='Maximal read length')
+    help='Maximal read length.')
 @click.option(
     '--bowtie-args', '-b',
-    help='Extra arguments for bowtie')
+    help='Extra arguments for bowtie.')
 def main(
     read_path_list: List[str],
     genome_path_list: List[str],
@@ -144,7 +144,7 @@ def main(
     min_read_len: int, max_read_len: int,
     bowtie_args: str
 ) -> None:
-    """ Sequencing pipeline
+    """ Sequencing pipeline.
     """
     if len(read_path_list) == 0:
         print('No paths given...')
