@@ -11,7 +11,7 @@ import seqpipe
 DATA_ROOT = 'seqpipe/tests/data/'
 
 def test_file_gathering() -> None:
-    fnames = seqpipe.main.gather_files([
+    fnames = seqpipe.gather_files([
         f'{DATA_ROOT}/references/00-ref.fa',
         f'{DATA_ROOT}/reads',
         f'{DATA_ROOT}/references/20-ref.fa'])
@@ -29,7 +29,8 @@ def test_whole_pipeline() -> None:
         output_dir = f'{tmpdirname}/output/'
 
         runner = CliRunner()
-        result = runner.invoke(seqpipe.main.run, [
+        result = runner.invoke(seqpipe.main.cli, [
+            'map',
             '--read', f'{DATA_ROOT}/reads/foo.fastq.gz',
             '--genome', f'{DATA_ROOT}/references/20-ref.fa',
             '-o', output_dir, '-b', '-a -v0'

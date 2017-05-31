@@ -39,7 +39,7 @@ setup(
 
     entry_points={
         'console_scripts': [
-            'seqpipe=seqpipe:run',
+            'seqpipe=seqpipe:cli',
         ],
     },
 )

@@ -145,3 +145,8 @@ Create dev-builds with:
 ```bash
 $ pip install --user -e .
 ```
+
+Run uninstalled version:
+```bash
+$ python -m seqpipe.main
+```
