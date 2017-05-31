@@ -3,6 +3,7 @@ import json
 import tempfile
 
 import pysam
+import pytest
 from click.testing import CliRunner
 
 import seqpipe
@@ -24,6 +25,9 @@ def test_file_gathering() -> None:
         f'{DATA_ROOT}/references/20-ref.fa'
     ]
 
+@pytest.mark.skipif(
+    'TRAVIS' in os.environ and os.environ['TRAVIS'] == 'true',
+    reason='Skip on Travis CI.')
 def test_whole_pipeline() -> None:
     with tempfile.TemporaryDirectory() as tmpdirname:
         output_dir = f'{tmpdirname}/output/'
