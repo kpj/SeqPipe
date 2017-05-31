@@ -12,7 +12,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-from utils import compute_statistics
+from .utils import compute_statistics
 
 
 def ensure_sanity() -> None:
@@ -45,6 +45,10 @@ def read_distribution(df: pd.DataFrame, absolute: bool) -> None:
     plt.savefig('images/read_distribution.pdf')
 
 def main(files: Sized, absolute: bool = False) -> None:
+    if len(files) == 0:
+        print('No files provided')
+        return
+
     ensure_sanity()
     df = compute_statistics(files)
 

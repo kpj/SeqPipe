@@ -57,6 +57,19 @@ def cmd1(*args, **kwargs) -> None:
     from .mapping.env_setup import run_pipeline
     run_pipeline(*args, **kwargs)
 
+@cli.group()
+def stats():
+    pass
+
+@stats.command(name='plot_rdist')
+@click.option(
+    '--absolute/--relative', default=False,
+    help='Plot absolute or relative mapped read counts')
+@click.argument('files', nargs=-1, type=click.Path(exists=True))
+def cmd2(*args, **kwargs) -> None:
+    from .statistics import plot_mapping_overview
+    plot_mapping_overview(*args, **kwargs)
+
 
 if __name__ == '__main__':
     cli()
