@@ -79,8 +79,8 @@ class SequencingRun:
 
         return res
 
+    @staticmethod
     def _prepare_environment(
-        self,
         read_path: str, genome_path: str,
         output_dir: str
     ) -> Tuple[str, str, str]:
