@@ -1,6 +1,7 @@
 # RNAseq Analysis Pipeline
 
 [![PyPI](https://img.shields.io/pypi/v/seqpipe.svg?style=flat)]()
+[![Build Status](https://travis-ci.org/kpj/SeqPipe.svg?branch=master)](https://travis-ci.org/kpj/SeqPipe)
 
 ## Installation
 
