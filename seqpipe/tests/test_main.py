@@ -29,7 +29,7 @@ def test_whole_pipeline() -> None:
         output_dir = f'{tmpdirname}/output/'
 
         runner = CliRunner()
-        result = runner.invoke(seqpipe.main.cli, [
+        result = runner.invoke(seqpipe.cli, [
             'map',
             '--read', f'{DATA_ROOT}/reads/foo.fastq.gz',
             '--genome', f'{DATA_ROOT}/references/20-ref.fa',

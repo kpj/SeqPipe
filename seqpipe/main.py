@@ -54,7 +54,7 @@ def cli():
     '--threads', '-t', default=int(cpu_count() * 4/5),
     help='How many threads to run in.')
 def cmd1(*args, **kwargs) -> None:
-    from .env_setup import run_pipeline
+    from .mapping.env_setup import run_pipeline
     run_pipeline(*args, **kwargs)
 
 

@@ -1,3 +1,3 @@
 from .main import cli
 
-from .env_setup import *
+from .mapping import *
