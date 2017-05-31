@@ -4,7 +4,6 @@ Visualize fraction of reads mapped to intermediate results
 
 import os
 import sys
-import shutil
 import subprocess
 
 import pandas as pd
@@ -100,7 +99,7 @@ def plot_piecharts(df, fname_base):
     print('\n> Creating pie charts')
     for read_name, group in df.groupby('read_name'):
         names, values = [], []
-        for i, row in group.iterrows():
+        for _, row in group.iterrows():
             names.append(row['reference'])
             values.append(row['count'])
 

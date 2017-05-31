@@ -82,7 +82,7 @@ def annotate_with_gff(references, gff_fname, pattern):
         df = df_gff[(df_gff.seqid == ref) & df_gff.attributes.str.contains(pattern)]
 
         data[ref] = []
-        for index, row in df.iterrows():
+        for _, row in df.iterrows():
             data[ref].append({
                 'start': row.start,
                 'end': row.end,
@@ -116,7 +116,7 @@ def annotate_peak_positions(references, df_cov, depth_thres_frac=.5):
         start = None
         cur = None
         strand = None
-        for index, row in sub.iterrows():
+        for _, row in sub.iterrows():
             if start is None:
                 start = row.position
                 cur = start
@@ -182,7 +182,7 @@ def annotate_read_pattern(
         enriched_bases = ''
         score_string = ''
 
-        for pos, bases in base_freqs.items():
+        for _, bases in base_freqs.items():
             best_base = max(bases, key=lambda b: bases[b])
 
             total_count = sum(bases.values())
