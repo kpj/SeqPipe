@@ -74,12 +74,13 @@ def parse_single_mapping_result(fname_base: str, split: bool) -> pd.DataFrame:
         with open(os.path.join(read_entry.path, 'meta.json')) as fd:
             cur_meta = json.load(fd)
 
+        total_count = count_fastq_sequences(
+            os.path.join(
+                read_entry.path, 'data', cur_meta['trimmed_read_path']))
+
         if not split:
             mapped_count = count_bam_reads(
                 os.path.join(read_entry.path, 'aligned_reads.bam'))
-            total_count = count_fastq_sequences(
-                os.path.join(
-                    read_entry.path, 'data', cur_meta['trimmed_read_path']))
 
             df = df.append({
                 'read_name': cur_meta['read_base'],
@@ -89,10 +90,6 @@ def parse_single_mapping_result(fname_base: str, split: bool) -> pd.DataFrame:
                 'total_count': total_count
             }, ignore_index=True)
         else:
-            total_count = count_fastq_sequences(
-                os.path.join(
-                    read_entry.path, 'data', cur_meta['trimmed_read_path']))
-
             bam = os.path.join(read_entry.path, 'aligned_reads.bam')
             counts = count_bam_reads_per_sub(bam)
 

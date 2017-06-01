@@ -3,7 +3,11 @@ import json
 import tempfile
 
 import pysam
+import numpy as np
+import pandas as pd
+
 import pytest
+import pandas.util.testing as pdt
 from click.testing import CliRunner
 
 import seqpipe
@@ -29,10 +33,12 @@ def test_file_gathering() -> None:
     'TRAVIS' in os.environ and os.environ['TRAVIS'] == 'true',
     reason='Skip on Travis CI.')
 def test_whole_pipeline() -> None:
+    runner = CliRunner()
+
     with tempfile.TemporaryDirectory() as tmpdirname:
         output_dir = f'{tmpdirname}/output/'
 
-        runner = CliRunner()
+        ## test mapping
         result = runner.invoke(seqpipe.cli, [
             'map',
             '--read', f'{DATA_ROOT}/reads/foo.fastq.gz',
@@ -69,3 +75,26 @@ def test_whole_pipeline() -> None:
 
         assert bamf.count(reference='special', start=0, end=7) == 1
         assert bamf.count(reference='anotherSpecial', start=0, end=15) == 0
+
+
+        ## test statistics
+        stats_dir = os.path.join(tmpdirname, 'statistics/')
+
+        result = runner.invoke(seqpipe.cli, [
+            'stats', 'plot_rdist',
+            '-o', stats_dir,
+            output_dir
+        ])
+        assert result.exit_code == 0
+
+        df = pd.read_csv(
+            os.path.join(stats_dir, 'read_distribution.csv'),
+            index_col=0)
+        pdt.assert_frame_equal(df.sort_index(axis=1), pd.DataFrame({
+            'mapped_count': [31.],
+            'read_name': ['foo.fastq'],
+            'reference': ['20-ref.fa'],
+            'sub_reference': [np.nan],
+            'total_count': [6.],
+            'rel_count': [1.]
+        }).sort_index(axis=1))
