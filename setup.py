@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='seqpipe',
-    version='0.0.5',
+    version='0.0.6',
 
     description='Sequencing pipeline',
     long_description_markdown_filename='README.md',
