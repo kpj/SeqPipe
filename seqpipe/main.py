@@ -65,6 +65,11 @@ def stats():
 @click.option(
     '--absolute/--relative', default=False,
     help='Plot absolute or relative mapped read counts')
+@click.option(
+    '--output', '-o', 'output_dir',
+    type=click.Path(file_okay=False, resolve_path=True),
+    help='Directory to save results to.',
+    default=f'results_{get_timestamp()}')
 @click.argument('files', nargs=-1, type=click.Path(exists=True))
 def cmd2(*args, **kwargs) -> None:
     from .statistics import plot_mapping_overview

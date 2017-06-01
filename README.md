@@ -55,7 +55,7 @@ This will create a `my_mapping` directory which contains two directories:
 
 An overview of the read distributions can then be generated via:
 ```bash
-$ seqpipe stats plot_rdist my_mapping/
+$ seqpipe stats plot_rdist -o my_images/ my_mapping/
 ```
 
 ## Extras
