@@ -22,6 +22,7 @@ Commands:
   map
   stats
 ```
+In particular, the mapping pipeline is interesting:
 ```bash
 $ seqpipe map --help
 Usage: seqpipe map [OPTIONS]
