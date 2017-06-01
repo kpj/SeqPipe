@@ -7,7 +7,7 @@ import sys
 import json
 import subprocess
 
-from typing import Sized, Dict
+from typing import Dict, List
 
 import pandas as pd
 
@@ -105,18 +105,31 @@ def parse_single_mapping_result(fname_base: str, split: bool) -> pd.DataFrame:
     df.to_csv(fname_cache)
     return df
 
-def compute_statistics(fnames: Sized, split: bool = False) -> pd.DataFrame:
+def compute_statistics(fnames: List, split: bool = False) -> pd.DataFrame:
     """ Aggregate statistics over all given mappings
     """
+    # filter out invalid directories
+    filtered_fnames = []
+    for fn in fnames:
+        if os.path.exists(os.path.join(fn, 'info.json')):
+            filtered_fnames.append(fn)
+        else:
+            print(f'Invalid file: "{fn}"')
+
+    if len(filtered_fnames) == 0:
+        raise RuntimeError('No valid files provided')
+
+    # compute statistics
     core_num = int(cpu_count() * 4/5)
     result = Parallel(n_jobs=core_num)(
-        delayed(parse_single_mapping_result)(fn, split) for fn in tqdm(fnames))
+        delayed(parse_single_mapping_result)(fn, split)
+            for fn in tqdm(filtered_fnames))
     return pd.concat(result).reset_index(drop=True)
 
 @click.command()
 @click.option('--split/--no-split', default=False)
 @click.argument('files', nargs=-1, type=click.Path(exists=True))
-def main(split: bool, files: Sized) -> None:
+def main(split: bool, files: List) -> None:
     if len(files) == 0:
         print('No files provided')
         return

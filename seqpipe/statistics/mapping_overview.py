@@ -5,7 +5,7 @@ Generate various plots for general mapping overviews
 import os
 import sys
 
-from typing import Dict, Sized
+from typing import Dict, List
 
 import pandas as pd
 
@@ -44,7 +44,7 @@ def read_distribution(
     plt.tight_layout()
     plt.savefig(f'{output_dir}/read_distribution.pdf')
 
-def main(files: Sized, absolute: bool, output_dir: str) -> None:
+def main(files: List, absolute: bool, output_dir: str) -> None:
     if len(files) == 0:
         print('No files provided')
         return
