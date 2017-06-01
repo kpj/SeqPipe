@@ -58,5 +58,7 @@ def main(files: Sized, absolute: bool, output_dir: str) -> None:
     ensure_sanity()
     df = compute_statistics(files)
 
-    os.makedirs(output_dir)
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
     read_distribution(df, absolute, output_dir)
