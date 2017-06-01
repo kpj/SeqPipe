@@ -71,24 +71,22 @@ class SequencingRun:
         read_path: str, genome_path: str,
         output_dir: str
     ) -> None:
-        rp, gp, od = self._prepare_environment(
-            read_path, genome_path, output_dir)
-
-        self.read_path = rp
-        self.genome_path = gp
-        self.output_dir = od
+        self.read_path = read_path
+        self.genome_path = genome_path
+        self.output_dir = output_dir
 
     def __call__(self, param_obj: Dict) -> Dict:
+        # prepare data/directory structures
+        rp, gp, od = self._prepare_environment(
+            self.read_path, self.genome_path, self.output_dir)
+
+        # execute pipeline
         stream = PipelineStream()
-        res = pipeline(
-            self.read_path, self.genome_path,
-            self.output_dir, param_obj,
-            stream)
+        res = pipeline(rp, gp, od, param_obj, stream)
         log_value = stream.getvalue()
 
         # save log
-        #print(log_value)
-        log_path = os.path.join(self.output_dir, 'log.txt')
+        log_path = os.path.join(od, 'log.txt')
         with open(log_path, 'w') as fd:
             fd.write(log_value)
 
@@ -168,6 +166,7 @@ def run_pipeline(
     # save meta-information
     param_obj = click.get_current_context().params
 
+    os.makedirs(output_dir)
     param_path = os.path.join(output_dir, 'info.json')
     with open(param_path, 'w') as fd:
         json.dump(param_obj, fd)
