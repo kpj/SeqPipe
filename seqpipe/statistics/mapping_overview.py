@@ -18,12 +18,6 @@ import matplotlib.pyplot as plt
 from .utils import compute_statistics
 
 
-def ensure_sanity() -> None:
-    """ Check that environment looks usable
-    """
-    if not os.path.isdir('images'):
-        os.mkdir('images')
-
 def compute_relative_counts(
     row: pd.Series,
     total_align_num: Dict[str, int]
@@ -55,7 +49,6 @@ def main(files: Sized, absolute: bool, output_dir: str) -> None:
         print('No files provided')
         return
 
-    ensure_sanity()
     df = compute_statistics(files)
 
     if not os.path.exists(output_dir):
