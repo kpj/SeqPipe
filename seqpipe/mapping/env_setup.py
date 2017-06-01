@@ -55,13 +55,13 @@ def all_tools_available() -> bool:
 class PipelineStream(io.StringIO):
     """ Print and save output at the same time
     """
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.ansi_escape = re.compile(r'\x1b[^m]*m')
 
-    def write(self, s):
+    def write(self, s: str) -> int:
         print(s, end='', flush=True)
-        super().write(self.ansi_escape.sub('', s))
+        return super().write(self.ansi_escape.sub('', s))
 
 class SequencingRun:
     """ Store information regarding a single sequencing run
