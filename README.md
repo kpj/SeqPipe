@@ -163,7 +163,6 @@ $ python -m seqpipe.main
 
 Enable bash-autocompletion as follows:
 ```bash
-$ _SEQPIPE_COMPLETE=source seqpipe > ~/.seqpipe_ac.sh
-$ cat ~/.seqpipe_ac.sh >> ~/.bashrc
+$ _SEQPIPE_COMPLETE=source seqpipe >> ~/.bashrc
 $ . ~/.bashrc
 ```
