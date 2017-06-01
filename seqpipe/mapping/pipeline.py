@@ -164,7 +164,7 @@ def pipeline(
         f' > BAM processing: {seconds2string(bam_duration)}',
         file=out_stream)
     print(
-        f' > Script execution: {seconds2string(script_duration)}',
+        f' > Script execution: {seconds2string(script_duration) if param_obj["exec_scripts"] else "skipped"}',
         file=out_stream)
 
     # save meta-information
