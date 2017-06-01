@@ -82,11 +82,10 @@ Tools:
 * cutadapt
 * fastqc
   * [more info](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/Help/3%20Analysis%20Modules/)
-* bowtie2
+* bowtie
 * samtools
   * [specifications](https://samtools.github.io/hts-specs/SAMv1.pdf)
 * bedtools
-* moreutils
 
 Languages:
 * bash

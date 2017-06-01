@@ -13,11 +13,11 @@ import collections
 
 from typing import List, Tuple, Dict
 
-
+import sh
 import click
 from joblib import Parallel, delayed
 
-from .pipeline import pipeline
+from .pipeline import pipeline, USED_TOOLS
 
 
 def gather_files(path_list: List[str]) -> List[str]:
@@ -36,6 +36,21 @@ def gather_files(path_list: List[str]) -> List[str]:
 
     # return unique paths while preserving order
     return list(collections.OrderedDict.fromkeys(out))
+
+def all_tools_available() -> bool:
+    """ Check that all needed tools are available on startup
+    """
+    missing = []
+    for tool in USED_TOOLS:
+        try:
+            sh.Command(tool)
+        except sh.CommandNotFound:
+            missing.append(tool)
+
+    if len(missing) > 0:
+        print(f'Cannot start pipeline, missing tools: {missing}')
+
+    return len(missing) == 0
 
 class PipelineStream(io.StringIO):
     """ Print and save output at the same time
@@ -128,6 +143,9 @@ def run_pipeline(
     """ Create read-genome matrix and compute all read alignments.
         Subsequently, apply various scripts and aggregate results.
     """
+    if not all_tools_available():
+        exit(-1)
+
     if len(read_path_list) == 0:
         print('No paths given...')
         exit(-1)

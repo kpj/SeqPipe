@@ -25,6 +25,8 @@ COLORS = {
     'reset': colorama.Style.RESET_ALL
 }
 
+USED_TOOLS = ['cutadapt', 'fastqc', 'bowtie', 'samtools', 'bedtools']
+
 @contextmanager
 def cwd(path: str) -> Generator:
     """ Temporarily change working directory
