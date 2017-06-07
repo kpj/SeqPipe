@@ -64,7 +64,7 @@ def stats():
 @stats.command(name='plot_rdist')
 @click.option(
     '--absolute/--relative', default=False,
-    help='Plot absolute or relative mapped read counts')
+    help='Plot absolute or relative mapped read counts.')
 @click.option(
     '--output', '-o', 'output_dir',
     type=click.Path(file_okay=False, resolve_path=True),
