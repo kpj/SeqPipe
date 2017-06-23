@@ -126,9 +126,6 @@ def compute_statistics(fnames: List, split: bool = False) -> pd.DataFrame:
             for fn in tqdm(filtered_fnames))
     return pd.concat(result).reset_index(drop=True)
 
-@click.command()
-@click.option('--split/--no-split', default=False)
-@click.argument('files', nargs=-1, type=click.Path(exists=True))
 def main(split: bool, files: List) -> None:
     if len(files) == 0:
         print('No files provided')
