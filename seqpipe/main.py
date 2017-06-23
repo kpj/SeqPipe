@@ -24,7 +24,7 @@ def get_timestamp() -> str:
 def cli():
     pass
 
-@cli.command(name='map')
+@cli.command(name='map', help='Read alignment pipeline.')
 @click.option(
     '--read', '-r', 'read_path_list',
     multiple=True, type=click.Path(exists=True, resolve_path=True),
@@ -57,11 +57,11 @@ def cmd1(*args, **kwargs) -> None:
     from .mapping.env_setup import run_pipeline
     run_pipeline(*args, **kwargs)
 
-@cli.group()
+@cli.group(help='Post-processing tools.')
 def stats():
     pass
 
-@stats.command(name='plot_rdist')
+@stats.command(name='plot_rdist', help='Plot read alignment distributions.')
 @click.option(
     '--absolute/--relative', default=False,
     help='Plot absolute or relative mapped read counts.')
@@ -75,7 +75,7 @@ def cmd2(*args, **kwargs) -> None:
     from .statistics import plot_mapping_overview
     plot_mapping_overview(*args, **kwargs)
 
-@stats.command(name='generate')
+@stats.command(name='generate', help='Create CSV containing basic statistics.')
 @click.option('--split/--no-split', default=False)
 @click.argument('files', nargs=-1, type=click.Path(exists=True))
 def cmd3(*args, **kwargs) -> None:
