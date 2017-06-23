@@ -7,6 +7,7 @@ import sys
 import json
 import subprocess
 
+from pathlib import Path
 from typing import Dict, List
 
 import pandas as pd
@@ -54,10 +55,11 @@ def count_bam_reads_per_sub(bam: str) -> Dict[str, int]:
 def parse_single_mapping_result(fname_base: str, split: bool) -> pd.DataFrame:
     """ Compute read-count statistics
     """
-    dir_pref = os.path.dirname(fname_base) or '.'
-    fname_result = dir_pref + '/statistics_' + os.path.basename(fname_base)
-    fname_cache = os.path.join(
-        fname_result, f'stats_{"split" if split else "nosplit"}.csv')
+    dir_pref = Path(os.path.dirname(fname_base) or '.')
+    fname_result = dir_pref / '_statistics'
+
+    fc_app = 'split' if split else 'nosplit'
+    fname_cache = fname_result / f'stats_{fc_app}.csv'
 
     if os.path.exists(fname_cache):
         print('Cached', fname_cache)
