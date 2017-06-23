@@ -61,12 +61,12 @@ def parse_single_mapping_result(fname_base: str, split: bool) -> pd.DataFrame:
     fc_app = 'split' if split else 'nosplit'
     fname_cache = fname_result / f'stats_{fc_app}.csv'
 
-    if os.path.exists(fname_cache):
+    if fname_cache.exists():
         print('Cached', fname_cache)
         return pd.read_csv(fname_cache, index_col=0)
 
-    if not os.path.exists(fname_result):
-        os.makedirs(fname_result)
+    if not fname_result.is_dir():
+        os.makedirs(str(fname_result))
 
     # compute statistics
     df = pd.DataFrame()
