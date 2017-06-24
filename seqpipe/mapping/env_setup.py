@@ -116,7 +116,7 @@ class SequencingRun:
         os.makedirs(os.path.join(pipeline_dir, 'results'))
 
         # copy needed files/directories
-        shutil.copy(genome_path, genome_remote)
+        shutil.copyfile(genome_path, genome_remote)
 
         with gzip.open(read_path, 'rb') as fd_in:
             with open(read_remote, 'wb') as fd_out:
