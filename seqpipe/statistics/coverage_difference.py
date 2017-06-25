@@ -19,6 +19,9 @@ import pysam
 from tqdm import tqdm
 
 
+Conf = collections.namedtuple(
+    'config', ['read1', 'read2', 'ref', 'sub_ref'])
+
 def gather_files(dir_: str) -> List:
     """ Find all alignment files
     """
@@ -40,7 +43,7 @@ def gather_files(dir_: str) -> List:
         })
     return result
 
-def compute_coverage(data) -> pd.DataFrame:
+def compute_coverage(data: List) -> pd.DataFrame:
     """ Compute per-base coverage
     """
     result = []
@@ -62,8 +65,8 @@ def compute_coverage(data) -> pd.DataFrame:
     return pd.DataFrame(result)
 
 def plot_entry(
-    cov1: dict, cov2: dict,
-    conf: collections.namedtuple,
+    cov1: np.ndarray, cov2: np.ndarray,
+    conf: Conf,
     output_dir: str
 ) -> None:
     """ Plot a particular configuration
@@ -76,24 +79,26 @@ def plot_entry(
     plt.subplot(311)
     plt.plot(cov1)
     plt.title(conf.read1)
-    plt.ylim((0,max_cov))
+    plt.ylim((0, max_cov))
 
     plt.subplot(312)
     plt.plot(cov1-cov2)
     plt.title(f'Difference: {conf.read1}-{conf.read2}')
-    plt.ylim((-max_cov,max_cov))
+    plt.ylim((-max_cov, max_cov))
 
     plt.subplot(313)
     plt.plot(cov2)
     plt.title(conf.read2)
-    plt.ylim((0,max_cov))
+    plt.ylim((0, max_cov))
 
     # surrounding graphics
     plt.suptitle(f'reference: {conf.ref}, sub-reference: {conf.sub_ref}')
 
     with sns.axes_style('white'):
         plt.gcf().add_subplot(111, frameon=False)
-        plt.tick_params(labelcolor='none', top='off', bottom='off', left='off', right='off')
+        plt.tick_params(
+            labelcolor='none',
+            top='off', bottom='off', left='off', right='off')
         plt.xlabel('base position')
         plt.ylabel('base coverage')
 
@@ -109,9 +114,6 @@ def plot_entry(
 def plot_coverage_differences(df: pd.DataFrame, output_dir: str) -> None:
     """ Create difference plots
     """
-    Conf = collections.namedtuple(
-        'config', ['read1', 'read2', 'ref', 'sub_ref'])
-
     for ref, group in tqdm(df.groupby('reference')):
         all_reads = group['read'].unique()
         for read1, read2 in itertools.combinations(all_reads, 2):
@@ -127,7 +129,7 @@ def plot_coverage_differences(df: pd.DataFrame, output_dir: str) -> None:
                 conf = Conf(read1=read1, read2=read2, ref=ref, sub_ref=sub)
                 plot_entry(cov1_d[sub], cov2_d[sub], conf, output_dir)
 
-def main(files: List, output_dir: str):
+def main(files: List, output_dir: str) -> None:
     if len(files) == 0:
         print('No files provided')
         return

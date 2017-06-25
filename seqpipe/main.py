@@ -58,7 +58,7 @@ def cmd1(*args, **kwargs) -> None:
     run_pipeline(*args, **kwargs)
 
 @cli.group(help='Post-processing tools.')
-def stats():
+def stats() -> None:
     pass
 
 @stats.command(name='plot_rdist', help='Plot read alignment distributions.')
@@ -89,7 +89,7 @@ def cmd3(*args, **kwargs) -> None:
     help='Directory to save results to.',
     default=f'results_{get_timestamp()}')
 @click.argument('files', nargs=-1, type=click.Path(exists=True))
-def cmd3(*args, **kwargs) -> None:
+def cmd4(*args, **kwargs) -> None:
     from .statistics import plot_coverage_difference
     plot_coverage_difference(*args, **kwargs)
 
