@@ -82,6 +82,17 @@ def cmd3(*args, **kwargs) -> None:
     from .statistics import generate_csv
     generate_csv(*args, **kwargs)
 
+@stats.command(name='plot_covdiff', help='Plot coverage difference plots.')
+@click.option(
+    '--output', '-o', 'output_dir',
+    type=click.Path(file_okay=False, resolve_path=True),
+    help='Directory to save results to.',
+    default=f'results_{get_timestamp()}')
+@click.argument('files', nargs=-1, type=click.Path(exists=True))
+def cmd3(*args, **kwargs) -> None:
+    from .statistics import plot_coverage_difference
+    plot_coverage_difference(*args, **kwargs)
+
 
 if __name__ == '__main__':
     cli()
