@@ -74,22 +74,23 @@ def plot_entry(
     """ Plot a particular configuration
     """
     max_cov = max(cov1.max(), cov2.max()) or 1
+    col_pal = list(sns.color_palette())
 
     plt.figure()
 
     # individual plots
     plt.subplot(311)
-    plt.plot(cov1)
+    plt.plot(cov1, color=col_pal[0])
     plt.title(conf.read1)
     plt.ylim((0, max_cov))
 
     plt.subplot(312)
-    plt.plot(cov1-cov2)
+    plt.plot(cov1-cov2, color=col_pal[1])
     plt.title(f'Difference: {conf.read1}-{conf.read2}')
     plt.ylim((-max_cov, max_cov))
 
     plt.subplot(313)
-    plt.plot(cov2)
+    plt.plot(cov2, color=col_pal[0])
     plt.title(conf.read2)
     plt.ylim((0, max_cov))
 
