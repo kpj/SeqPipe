@@ -22,19 +22,21 @@ from tqdm import tqdm
 Conf = collections.namedtuple(
     'config', ['read1', 'read2', 'ref', 'sub_ref'])
 
-def gather_files(dir_: str) -> List:
+def gather_files(dir_: str, references: List[str]) -> List:
     """ Find all alignment files
     """
     result = []
     for entry in tqdm(os.scandir(dir_), total=len(os.listdir(dir_))):
+        with open(os.path.join(entry.path, 'meta.json')) as fd:
+            meta = json.load(fd)
+        if references and meta['genome_base'] not in references:
+            continue
+
         aligned_bam_file = os.path.join(entry.path, 'aligned_reads.bam')
 
         pysam.index(aligned_bam_file)
         samfile = pysam.AlignmentFile(aligned_bam_file, 'rb')
         assert samfile.has_index()
-
-        with open(os.path.join(entry.path, 'meta.json')) as fd:
-            meta = json.load(fd)
 
         result.append({
             'read': meta['read_base'],
@@ -111,7 +113,10 @@ def plot_entry(
         f'covdiff_{conf.ref}_{conf.sub_ref}_{conf.read1}_{conf.read2}.pdf')
     plt.savefig(fname)
 
-def plot_coverage_differences(df: pd.DataFrame, output_dir: str) -> None:
+def plot_coverage_differences(
+    df: pd.DataFrame,
+    sub_references: List[str], output_dir: str
+) -> None:
     """ Create difference plots
     """
     for ref, group in tqdm(df.groupby('reference')):
@@ -126,18 +131,27 @@ def plot_coverage_differences(df: pd.DataFrame, output_dir: str) -> None:
             assert cov1_d.keys() == cov2_d.keys()
 
             for sub in cov1_d.keys():
+                if sub_references and sub not in sub_references:
+                    continue
+
                 conf = Conf(read1=read1, read2=read2, ref=ref, sub_ref=sub)
                 plot_entry(cov1_d[sub], cov2_d[sub], conf, output_dir)
 
-def main(files: List, output_dir: str) -> None:
+def main(
+    files: List,
+    references: List[str], sub_references: List[str],
+    output_dir: str
+) -> None:
     if len(files) == 0:
         print('No files provided')
         return
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
 
     data = []
     for fname in tqdm(files):
         fn = os.path.join(fname, 'runs')
-        tmp = gather_files(fn)
+        tmp = gather_files(fn, references)
         data.append((os.path.dirname(fname), tmp))
 
     df_list = []
@@ -146,4 +160,4 @@ def main(files: List, output_dir: str) -> None:
         df_list.append(df_tmp)
     df = pd.concat(df_list)
 
-    plot_coverage_differences(df, output_dir)
+    plot_coverage_differences(df, sub_references, output_dir)

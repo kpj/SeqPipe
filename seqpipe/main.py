@@ -84,6 +84,12 @@ def cmd3(*args, **kwargs) -> None:
 
 @stats.command(name='plot_covdiff', help='Plot coverage difference plots.')
 @click.option(
+    '--reference', 'references',
+    multiple=True, help='References to consider.')
+@click.option(
+    '--sub-reference', 'sub_references',
+    multiple=True, help='Sub-references to consider.')
+@click.option(
     '--output', '-o', 'output_dir',
     type=click.Path(file_okay=False, resolve_path=True),
     help='Directory to save results to.',
