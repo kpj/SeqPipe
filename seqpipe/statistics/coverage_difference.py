@@ -12,6 +12,8 @@ from typing import List
 import numpy as np
 import pandas as pd
 
+from scipy.special import binom
+
 import seaborn as sns
 import matplotlib.pyplot as plt
 
@@ -120,9 +122,13 @@ def plot_coverage_differences(
 ) -> None:
     """ Create difference plots
     """
-    for ref, group in tqdm(df.groupby('reference')):
+    for ref, group in tqdm(df.groupby('reference'), desc='references'):
         all_reads = group['read'].unique()
-        for read1, read2 in itertools.combinations(all_reads, 2):
+        for read1, read2 in tqdm(
+            itertools.combinations(all_reads, 2),
+            total=int(binom(len(all_reads), 2)),
+            desc='Read pairs'
+        ):
             tmp1 = group[group['read']==read1]
             tmp2 = group[group['read']==read2]
             assert tmp1.shape[0] == 1 == tmp2.shape[0]
@@ -131,7 +137,7 @@ def plot_coverage_differences(
             cov2_d = tmp2.iloc[0]['coverage']
             assert cov1_d.keys() == cov2_d.keys()
 
-            for sub in cov1_d.keys():
+            for sub in tqdm(cov1_d.keys(), desc='Sub-references'):
                 if sub_references and sub not in sub_references:
                     continue
 
