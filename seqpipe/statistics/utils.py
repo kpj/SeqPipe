@@ -104,7 +104,7 @@ def parse_single_mapping_result(fname_base: str, split: bool) -> pd.DataFrame:
                     'total_count': total_count
                 }, ignore_index=True)
 
-    df.to_csv(fname_cache)
+    df.to_csv(str(fname_cache))
     return df
 
 def compute_statistics(fnames: List, split: bool = False) -> pd.DataFrame:
