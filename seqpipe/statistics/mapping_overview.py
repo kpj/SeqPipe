@@ -29,7 +29,7 @@ def compute_relative_counts(
 
 def read_distribution(
     df: pd.DataFrame,
-    absolute: bool, output_dir: str
+    absolute: bool, split: bool, output_dir: str
 ) -> None:
     """ Plot read fractions mapped to references
     """
@@ -38,20 +38,25 @@ def read_distribution(
     df.to_csv(f'{output_dir}/read_distribution.csv')
 
     count_ref = 'mapped_count' if absolute else 'rel_count'
-    sub = df.pivot('read_name', 'reference')[count_ref]
+    ref_key = 'sub_reference' if split else 'reference'
+
+    sub = df.pivot('read_name', ref_key)[count_ref]
     sub.plot(kind='bar', stacked=True)
 
     plt.tight_layout()
     plt.savefig(f'{output_dir}/read_distribution.pdf')
 
-def main(files: List, absolute: bool, output_dir: str) -> None:
+def main(
+    files: List, output_dir: str,
+    absolute: bool, split: bool = False
+) -> None:
     if len(files) == 0:
         print('No files provided')
         return
 
-    df = compute_statistics(files)
+    df = compute_statistics(files, split=split)
 
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
-    read_distribution(df, absolute, output_dir)
+    read_distribution(df, absolute, split, output_dir)
