@@ -31,7 +31,7 @@ setup(
 
     setup_requires=['setuptools-markdown'],
     install_requires=[
-        'numpy', 'pandas', 'seaborn', 'matplotlib', 'colorama',
+        'numpy', 'scipy', 'pandas', 'seaborn', 'matplotlib', 'colorama',
         'tqdm', 'biopython', 'pysam', 'joblib', 'click', 'sh'],
     extras_require={
         'test': ['tox', 'pytest', 'coverage'],
