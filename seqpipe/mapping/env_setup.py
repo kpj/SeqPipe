@@ -118,10 +118,14 @@ class SequencingRun:
         # copy needed files/directories
         shutil.copyfile(genome_path, genome_remote)
 
-        with gzip.open(read_path, 'rb') as fd_in:
-            with open(read_remote, 'wb') as fd_out:
-                for line in fd_in:
-                    fd_out.write(line)
+        read_base = os.path.basename(read_path)
+        if read_base.endswith('.gz'):
+            with gzip.open(read_path, 'rb') as fd_in:
+                with open(read_remote, 'wb') as fd_out:
+                    for line in fd_in:
+                        fd_out.write(line)
+        else:
+            shutil.copyfile(read_path, read_remote)
 
         shutil.copytree(
             os.path.join(cur_dir, 'scripts'),
