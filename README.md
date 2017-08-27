@@ -92,6 +92,7 @@ Languages:
 * bash
 * python
   * numpy
+  * scipy
   * pandas
   * seaborn
   * matplotlib
