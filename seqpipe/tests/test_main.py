@@ -19,14 +19,14 @@ def test_file_gathering() -> None:
     fnames = seqpipe.gather_files([
         f'{DATA_ROOT}/references/00-ref.fa',
         f'{DATA_ROOT}/reads',
-        f'{DATA_ROOT}/references/20-ref.fa'])
+        f'{DATA_ROOT}/references/20-ref.fa.gz'])
 
     assert fnames == [
         f'{DATA_ROOT}/references/00-ref.fa',
         f'{DATA_ROOT}/reads/bar.fastq.gz',
         f'{DATA_ROOT}/reads/baz.fastq',
         f'{DATA_ROOT}/reads/foo.fastq.gz',
-        f'{DATA_ROOT}/references/20-ref.fa'
+        f'{DATA_ROOT}/references/20-ref.fa.gz'
     ]
 
 @pytest.mark.skipif(
@@ -42,7 +42,7 @@ def test_whole_pipeline() -> None:
         result = runner.invoke(seqpipe.cli, [
             'map',
             '--read', f'{DATA_ROOT}/reads/foo.fastq.gz',
-            '--genome', f'{DATA_ROOT}/references/20-ref.fa',
+            '--genome', f'{DATA_ROOT}/references/20-ref.fa.gz',
             '-o', output_dir, '-b', '-a -v0'
         ])
         assert result.exit_code == 0
@@ -53,10 +53,10 @@ def test_whole_pipeline() -> None:
         assert meta['read_path_list'] == [
             os.path.abspath(f'{DATA_ROOT}/reads/foo.fastq.gz')]
         assert meta['genome_path_list'] == [
-            os.path.abspath(f'{DATA_ROOT}/references/20-ref.fa')]
+            os.path.abspath(f'{DATA_ROOT}/references/20-ref.fa.gz')]
 
         # test mapping result
-        res_path = os.path.join(output_dir, 'runs', '20-ref.fa___foo.fastq.gz')
+        res_path = os.path.join(output_dir, 'runs', '20-ref.fa.gz___foo.fastq.gz')
 
         bam_path = os.path.join(res_path, 'data', 'mapping_sorted.bam')
         pysam.index(bam_path)
@@ -93,7 +93,7 @@ def test_whole_pipeline() -> None:
         pdt.assert_frame_equal(df.sort_index(axis=1), pd.DataFrame({
             'mapped_count': [31.],
             'read_name': ['foo.fastq'],
-            'reference': ['20-ref.fa'],
+            'reference': ['20-ref.fa.gz'],
             'sub_reference': [np.nan],
             'total_count': [6.],
             'rel_count': [1.]

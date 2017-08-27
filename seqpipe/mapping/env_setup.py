@@ -20,6 +20,18 @@ from joblib import Parallel, delayed
 from .pipeline import pipeline, USED_TOOLS
 
 
+def copy_file(source: str, destination: str) -> None:
+    """ Copy given file to destination and unpack if needed
+    """
+    fname = os.path.basename(source)
+    if fname.endswith('.gz'):  # gzipped
+        with gzip.open(source, 'rb') as fd_in:
+            with open(destination, 'wb') as fd_out:
+                for line in fd_in:
+                    fd_out.write(line)
+    else:  # raw file
+        shutil.copyfile(source, destination)
+
 def gather_files(path_list: List[str]) -> List[str]:
     """ Gather all files (eg from directories) in given list
     """
@@ -116,16 +128,8 @@ class SequencingRun:
         os.makedirs(os.path.join(pipeline_dir, 'results'))
 
         # copy needed files/directories
-        shutil.copyfile(genome_path, genome_remote)
-
-        read_base = os.path.basename(read_path)
-        if read_base.endswith('.gz'):
-            with gzip.open(read_path, 'rb') as fd_in:
-                with open(read_remote, 'wb') as fd_out:
-                    for line in fd_in:
-                        fd_out.write(line)
-        else:
-            shutil.copyfile(read_path, read_remote)
+        copy_file(read_path, read_remote)
+        copy_file(genome_path, genome_remote)
 
         shutil.copytree(
             os.path.join(cur_dir, 'scripts'),
