@@ -20,7 +20,7 @@ from joblib import Parallel, delayed
 from .pipeline import pipeline, USED_TOOLS
 
 
-def copy_file(source: str, destination: str) -> None:
+def unpack_file(source: str, destination: str) -> None:
     """ Copy given file to destination and unpack if needed
     """
     fname = os.path.basename(source)
@@ -128,8 +128,8 @@ class SequencingRun:
         os.makedirs(os.path.join(pipeline_dir, 'results'))
 
         # copy needed files/directories
-        copy_file(read_path, read_remote)
-        copy_file(genome_path, genome_remote)
+        unpack_file(read_path, read_remote)
+        unpack_file(genome_path, genome_remote)
 
         shutil.copytree(
             os.path.join(cur_dir, 'scripts'),
