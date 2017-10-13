@@ -9,17 +9,30 @@ import os
 # setup
 configfile: 'config.yaml'
 
-input_dir = config['directories']['input']
-output_dir = config['directories']['output']
+input_dir = config['directories']['reads']
+ref_dir = config['directories']['references']
+output_dir = config['directories']['results']
 
 ###
 # file gathering
 sample_list = []
-
-# quality control
 for entry in os.scandir(input_dir):
     tmp = entry.name.split('.')[0]
     sample_list.append(tmp)
+
+reference_list = []
+for entry in os.scandir(ref_dir):
+    tmp = entry.name.split('.')[0]
+    reference_list.append(tmp)
+
+qc_files = expand(
+    os.path.join(
+        output_dir, 'quality_control', '{sample}'), sample=sample_list)
+map_files = expand(
+    os.path.join(
+        output_dir, 'read_mapping', '{reference}', '{sample}.sam'),
+    sample=sample_list, reference=reference_list)
+all_result_files = qc_files + map_files
 
 ###
 # rule definitions
@@ -27,9 +40,7 @@ ruleorder: copy > gunzip
 
 rule all:
     input:
-        expand(
-            os.path.join(
-                output_dir, 'quality_control', '{sample}'), sample=sample_list)
+        all_result_files
 
 rule gunzip:
     input:
@@ -60,4 +71,30 @@ rule quality_control:
         """
         mkdir -p {output}
         fastqc --outdir={output} {input.read_file}
+        """
+
+rule read_mapping:
+    input:
+        read_file = os.path.join(output_dir, 'input', '{sample}.fastq'),
+        reference_file = srcdir(os.path.join(ref_dir, '{reference}.fa'))
+    output:
+        os.path.join(output_dir, 'read_mapping', '{reference}', '{sample}.sam')
+    params:
+        cwd = os.path.join(
+            output_dir, 'read_mapping', '{reference}', '{sample}_tmp')
+    log:
+        os.path.join(
+            output_dir, 'logs', 'read_mapping', '{sample}_{reference}.log')
+    shell:
+        """
+        mkdir -p {params.cwd}
+        mkdir -p $(dirname {workflow.basedir}/{output})
+
+        cd {params.cwd}
+        cp {input.reference_file} reference.fa
+
+        bwa index reference.fa
+        bwa mem \
+            reference.fa {workflow.basedir}/{input.read_file} \
+            > {workflow.basedir}/{output}
         """

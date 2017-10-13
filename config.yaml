@@ -1,3 +1,4 @@
 directories:
-    input: test_input
-    output: test_output
+    reads: input
+    references: references
+    results: output
