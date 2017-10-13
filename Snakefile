@@ -9,9 +9,10 @@ import os
 # setup
 configfile: 'config.yaml'
 
-input_dir = config['directories']['reads']
-ref_dir = config['directories']['references']
-output_dir = config['directories']['results']
+p = lambda p: os.path.relpath(p, start=workflow.basedir)
+input_dir = p(config['directories']['reads'])
+ref_dir = p(config['directories']['references'])
+output_dir = p(config['directories']['results'])
 
 ###
 # file gathering
