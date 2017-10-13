@@ -67,6 +67,10 @@ rule quality_control:
         read_file = os.path.join(output_dir, 'input', '{sample}.fastq')
     output:
         os.path.join(output_dir, 'quality_control', '{sample}')
+    benchmark:
+        os.path.join(
+            output_dir, 'benchmark', 'quality_control',
+            '{sample}.txt')
     shell:
         """
         mkdir -p {output}
@@ -82,9 +86,10 @@ rule read_mapping:
     params:
         cwd = os.path.join(
             output_dir, 'read_mapping', '{reference}', '{sample}_tmp')
-    log:
+    benchmark:
         os.path.join(
-            output_dir, 'logs', 'read_mapping', '{sample}_{reference}.log')
+            output_dir, 'benchmark', 'read_mapping',
+            '{sample}_{reference}.txt')
     shell:
         """
         mkdir -p {params.cwd}
