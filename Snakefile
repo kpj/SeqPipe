@@ -89,6 +89,8 @@ rule read_mapping:
     params:
         cwd = os.path.join(
             output_dir, 'read_mapping', '{reference}', '{sample}_tmp')
+    threads:
+        config['runtime']['threads']
     benchmark:
         os.path.join(
             output_dir, 'benchmark', 'read_mapping',
@@ -103,6 +105,7 @@ rule read_mapping:
 
         bwa index reference.fa
         bwa mem \
+            -t {threads} \
             reference.fa {workflow.basedir}/{input.read_file} \
             > {workflow.basedir}/{output}
         """

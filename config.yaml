@@ -2,3 +2,6 @@ directories:
     reads: input
     references: references
     results: output
+
+runtime:
+    threads: 2
