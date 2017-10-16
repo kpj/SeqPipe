@@ -7,12 +7,14 @@ import os
 
 ###
 # setup
-configfile: 'config.yaml'
+configfile: os.path.join(workflow.basedir, 'config.yaml')
 
 p = lambda p: os.path.relpath(p, start=workflow.basedir)
 input_dir = p(config['directories']['reads'])
 ref_dir = p(config['directories']['references'])
 output_dir = p(config['directories']['results'])
+
+os.chdir(workflow.basedir)
 
 ###
 # file gathering
