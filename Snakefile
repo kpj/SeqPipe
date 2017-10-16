@@ -33,7 +33,7 @@ qc_files = expand(
         output_dir, 'quality_control', '{sample}'), sample=sample_list)
 map_files = expand(
     os.path.join(
-        output_dir, 'read_mapping', '{reference}', '{sample}.sam'),
+        output_dir, 'read_mapping', '{reference}', '{sample}_filtered.sam'),
     sample=sample_list, reference=reference_list)
 all_result_files = qc_files + map_files
 
@@ -108,4 +108,23 @@ rule read_mapping:
             -t {threads} \
             reference.fa {workflow.basedir}/{input.read_file} \
             > {workflow.basedir}/{output}
+        """
+
+rule filter_mapping_result:
+    input:
+        fname = os.path.join(
+            output_dir, 'read_mapping', '{reference}', '{sample}.sam')
+    output:
+        os.path.join(
+            output_dir, 'read_mapping',
+            '{reference}', '{sample}_filtered.sam')
+    shell:
+        """
+        # filters: read quality, secondary reads, supplementary reads
+        samtools view \
+            -b \
+            -q 10 \
+            -F 256 \
+            -F 2048 \
+            {input.fname} > {output}
         """
