@@ -33,7 +33,7 @@ qc_files = expand(
         output_dir, 'quality_control', '{sample}'), sample=sample_list)
 map_files = expand(
     os.path.join(
-        output_dir, 'read_mapping', '{reference}', '{sample}_filtered.sam'),
+        output_dir, 'read_mapping', '{reference}', '{sample}_filtered.bam'),
     sample=sample_list, reference=reference_list)
 all_result_files = qc_files + map_files
 
@@ -117,7 +117,7 @@ rule filter_mapping_result:
     output:
         os.path.join(
             output_dir, 'read_mapping',
-            '{reference}', '{sample}_filtered.sam')
+            '{reference}', '{sample}_filtered.bam')
     shell:
         """
         # filters: read quality, secondary reads, supplementary reads
