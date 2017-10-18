@@ -31,11 +31,9 @@ for entry in os.scandir(ref_dir):
 qc_files = expand(
     os.path.join(
         output_dir, 'quality_control', '{sample}'), sample=sample_list)
-map_files = expand(
-    os.path.join(
-        output_dir, 'read_mapping', '{reference}', '{sample}_filtered.bam'),
-    sample=sample_list, reference=reference_list)
-all_result_files = qc_files + map_files
+rdist_overview = [os.path.join(
+    output_dir, 'results', 'read_distribution_overview.txt')]
+all_result_files = qc_files + rdist_overview
 
 ###
 # rule definitions
@@ -110,14 +108,14 @@ rule read_mapping:
             > {workflow.basedir}/{output}
         """
 
-rule filter_mapping_result:
+rule samtools_filter:
     input:
         fname = os.path.join(
             output_dir, 'read_mapping', '{reference}', '{sample}.sam')
     output:
         os.path.join(
             output_dir, 'read_mapping',
-            '{reference}', '{sample}_filtered.bam')
+            '{reference}', '{sample}.filtered.bam')
     shell:
         """
         # filters: read quality, secondary reads, supplementary reads
@@ -127,4 +125,19 @@ rule filter_mapping_result:
             -F 256 \
             -F 2048 \
             {input.fname} > {output}
+        """
+
+rule read_distribution_overview:
+    input:
+        bam_files = expand(
+            os.path.join(
+                output_dir, 'read_mapping',
+                '{reference}', '{sample}.filtered.bam'),
+            sample=sample_list, reference=reference_list),
+    output:
+        os.path.join(output_dir, 'results', 'read_distribution_overview.txt')
+    shell:
+        """
+        source functions.sh
+        aggregate_samtools_stats {input.bam_files} > {output}
         """
