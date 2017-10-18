@@ -127,17 +127,40 @@ rule samtools_filter:
             {input.fname} > {output}
         """
 
+rule samtools_sort:
+    input:
+        rules.samtools_filter.output
+    output:
+        os.path.join(
+            output_dir, 'read_mapping',
+            '{reference}', '{sample}.filtered.sorted.bam')
+    threads: config['runtime']['threads']
+    wrapper:
+        '0.2.0/bio/samtools/sort'
+
+rule samtools_index:
+    input:
+        rules.samtools_sort.output
+    output:
+        os.path.join(
+            output_dir, 'read_mapping',
+            '{reference}', '{sample}.filtered.sorted.bam.bai')
+    wrapper:
+        '0.2.0/bio/samtools/index'
+
 rule read_distribution_overview:
     input:
         bam_files = expand(
             os.path.join(
                 output_dir, 'read_mapping',
-                '{reference}', '{sample}.filtered.bam'),
+                '{reference}', '{sample}.filtered.sorted.bam'),
+            sample=sample_list, reference=reference_list),
+        index_files = expand(
+            os.path.join(
+                output_dir, 'read_mapping',
+                '{reference}', '{sample}.filtered.sorted.bam.bai'),
             sample=sample_list, reference=reference_list),
     output:
-        os.path.join(output_dir, 'results', 'read_distribution_overview.txt')
-    shell:
-        """
-        source functions.sh
-        aggregate_samtools_stats {input.bam_files} > {output}
-        """
+        report = os.path.join(output_dir, 'results', 'read_distribution_overview.txt')
+    script:
+        'scripts/rdist_overview.py'
