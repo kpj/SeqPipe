@@ -110,12 +110,9 @@ rule read_mapping:
 
 rule samtools_filter:
     input:
-        fname = os.path.join(
-            output_dir, 'read_mapping', '{reference}', '{sample}.sam')
+        '{sample}.sam'
     output:
-        os.path.join(
-            output_dir, 'read_mapping',
-            '{reference}', '{sample}.filtered.bam')
+        '{sample}.filtered.bam'
     shell:
         """
         # filters: read quality, secondary reads, supplementary reads
@@ -124,27 +121,23 @@ rule samtools_filter:
             -q 10 \
             -F 256 \
             -F 2048 \
-            {input.fname} > {output}
+            {input} > {output}
         """
 
 rule samtools_sort:
     input:
-        rules.samtools_filter.output
+        '{sample}.filtered.bam'
     output:
-        os.path.join(
-            output_dir, 'read_mapping',
-            '{reference}', '{sample}.filtered.sorted.bam')
+        '{sample}.filtered.sorted.bam'
     threads: config['runtime']['threads']
     wrapper:
         '0.2.0/bio/samtools/sort'
 
 rule samtools_index:
     input:
-        rules.samtools_sort.output
+        '{sample}.filtered.sorted.bam'
     output:
-        os.path.join(
-            output_dir, 'read_mapping',
-            '{reference}', '{sample}.filtered.sorted.bam.bai')
+        '{sample}.filtered.sorted.bam.bai'
     wrapper:
         '0.2.0/bio/samtools/index'
 
