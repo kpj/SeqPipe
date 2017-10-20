@@ -12,8 +12,14 @@ $ pip install snakemake
 
 Furthermore, the following software is used:
 
+* gzip
 * FastQC
 * BWA
+* samtools
+* python 3.6
+    * pysam
+    * matplotlib
+    * matplotlib_venn
 
 ## Usage
 
