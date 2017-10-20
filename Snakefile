@@ -78,10 +78,25 @@ rule quality_control:
         fastqc --outdir={output} {input.read_file}
         """
 
+rule reference_indexing:
+    input:
+        reference_file = srcdir(os.path.join(ref_dir, '{reference}.fa'))
+    output:
+        os.path.join(output_dir, 'read_mapping', '{reference}', 'index')
+    shell:
+        """
+        mkdir -p {output}
+        cd {output}
+
+        cp {input.reference_file} reference.fa
+        bwa index reference.fa
+        """
+
 rule read_mapping:
     input:
         read_file = os.path.join(output_dir, 'input', '{sample}.fastq'),
-        reference_file = srcdir(os.path.join(ref_dir, '{reference}.fa'))
+        reference_dir = os.path.join(
+            output_dir, 'read_mapping', '{reference}', 'index')
     output:
         os.path.join(output_dir, 'read_mapping', '{reference}', '{sample}.sam')
     params:
@@ -99,12 +114,11 @@ rule read_mapping:
         mkdir -p $(dirname {workflow.basedir}/{output})
 
         cd {params.cwd}
-        cp {input.reference_file} reference.fa
 
-        bwa index reference.fa
         bwa mem \
             -t {threads} \
-            reference.fa {workflow.basedir}/{input.read_file} \
+            {workflow.basedir}/{input.reference_dir}/reference.fa \
+            {workflow.basedir}/{input.read_file} \
             > {workflow.basedir}/{output}
         """
 
