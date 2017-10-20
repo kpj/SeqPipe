@@ -98,10 +98,8 @@ rule read_mapping:
         reference_dir = os.path.join(
             output_dir, 'read_mapping', '{reference}', 'index')
     output:
-        os.path.join(output_dir, 'read_mapping', '{reference}', '{sample}.sam')
-    params:
-        cwd = os.path.join(
-            output_dir, 'read_mapping', '{reference}', '{sample}_tmp')
+        os.path.join(
+            output_dir, 'read_mapping', '{reference}', '{sample}', 'reads.sam')
     threads:
         config['runtime']['threads']
     benchmark:
@@ -110,10 +108,7 @@ rule read_mapping:
             '{sample}_{reference}.txt')
     shell:
         """
-        mkdir -p {params.cwd}
         mkdir -p $(dirname {workflow.basedir}/{output})
-
-        cd {params.cwd}
 
         bwa mem \
             -t {threads} \
@@ -160,12 +155,12 @@ rule read_distribution_overview:
         bam_files = expand(
             os.path.join(
                 output_dir, 'read_mapping',
-                '{reference}', '{sample}.filtered.sorted.bam'),
+                '{reference}', '{sample}', 'reads.filtered.sorted.bam'),
             sample=sample_list, reference=reference_list),
         index_files = expand(
             os.path.join(
                 output_dir, 'read_mapping',
-                '{reference}', '{sample}.filtered.sorted.bam.bai'),
+                '{reference}', '{sample}', 'reads.filtered.sorted.bam.bai'),
             sample=sample_list, reference=reference_list),
     output:
         report = os.path.join(output_dir, 'results', 'read_distribution_overview.txt')
