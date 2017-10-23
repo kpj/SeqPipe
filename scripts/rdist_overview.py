@@ -20,10 +20,10 @@ def main(bam_files: List[str], report_fname: str) -> None:
     for fname in bam_files:
         alf = pysam.AlignmentFile(fname)
         read_names = [seg.query_name for seg in alf.fetch()]
-        #read_ids[fname] = read_names
 
-        read_name = os.path.basename(fname).split('.')[0]
-        ref_name = fname.split('/')[-2]
+        dname = os.path.dirname(fname)
+        read_name = dname.split('/')[-1]
+        ref_name = dname.split('/')[-2]
 
         read_ids[read_name][ref_name] = read_names
     read_ids = dict(read_ids)
