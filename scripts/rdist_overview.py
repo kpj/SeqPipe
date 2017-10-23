@@ -41,6 +41,7 @@ def main(bam_files: List[str], report_fname: str) -> None:
 
         plt.figure()
         venn2(subsets=data_list, set_labels=label_list)
+        plt.title(f'Readfile: "{read_name}"')
         plt.savefig(f'{os.path.dirname(report_fname)}/{read_name}_venn.pdf')
 
     # save raw data
