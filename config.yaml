@@ -5,3 +5,6 @@ directories:
 
 runtime:
     threads: 2
+
+conditions:
+    assess_read_quality: true

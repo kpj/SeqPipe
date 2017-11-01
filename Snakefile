@@ -30,7 +30,8 @@ for entry in os.scandir(ref_dir):
 
 qc_files = expand(
     os.path.join(
-        output_dir, 'quality_control', '{sample}'), sample=sample_list)
+        output_dir, 'quality_control', '{sample}'), sample=sample_list) \
+    if config['conditions']['assess_read_quality'] else []
 rdist_overview = [os.path.join(
     output_dir, 'results', 'read_distribution_overview.txt')]
 all_result_files = qc_files + rdist_overview
