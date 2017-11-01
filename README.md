@@ -35,3 +35,7 @@ Create an overview of the pipeline:
 ```bash
 $ snakemake --dag | dot -Tpng > overview.png
 ```
+
+An exemplary pipeline DAG for aligning reads of the samples `A` and `B` to the references `test` and `test2` can be seen below.
+
+![pipeline DAG](./docs/dag.png)
