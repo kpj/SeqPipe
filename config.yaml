@@ -1,10 +1,11 @@
 directories:
-    reads: input
-    references: references
-    results: output
+    reads: input               # directory with reads in fastq format
+    references: references     # directory with references in fasta format
+    results: output            # where to dump results
 
 runtime:
-    threads: 2
+    threads: 2                 # how many threads to use
 
 conditions:
-    assess_read_quality: true
+    assess_read_quality: true  # use FastQC to check read quality
+    adapter_file: adapter.txt  # skip adapter trimming if file doesn't exist (file should only contain sequence)

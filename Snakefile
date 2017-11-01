@@ -16,6 +16,9 @@ output_dir = p(config['directories']['results'])
 
 os.chdir(workflow.basedir)
 
+do_adapter_trimming = os.path.exists(config['conditions']['adapter_file'])
+premapsuffix = 'noadapters' if do_adapter_trimming else 'raw'
+
 ###
 # file gathering
 sample_list = []
@@ -48,7 +51,7 @@ rule gunzip:
     input:
         fname = os.path.join(input_dir, '{sample}.fastq.gz')
     output:
-        os.path.join(output_dir, 'input', '{sample}.fastq')
+        os.path.join(output_dir, 'input', '{sample}.raw.fastq')
     shell:
         """
         gunzip -c {input.fname} > {output}
@@ -58,7 +61,7 @@ rule copy:
     input:
         fname = os.path.join(input_dir, '{sample}.fastq')
     output:
-        os.path.join(output_dir, 'input', '{sample}.fastq')
+        os.path.join(output_dir, 'input', '{sample}.raw.fastq')
     shell:
         """
         cp {input.fname} {output}
@@ -66,7 +69,8 @@ rule copy:
 
 rule quality_control:
     input:
-        read_file = os.path.join(output_dir, 'input', '{sample}.fastq')
+        read_file = os.path.join(
+            output_dir, 'input', '{sample}.'+premapsuffix+'.fastq')
     output:
         os.path.join(output_dir, 'quality_control', '{sample}')
     benchmark:
@@ -77,6 +81,19 @@ rule quality_control:
         """
         mkdir -p {output}
         fastqc --outdir={output} {input.read_file}
+        """
+
+rule adapter_trimming:
+    input:
+        fname = os.path.join(output_dir, 'input', '{sample}.raw.fastq')
+    output:
+        os.path.join(output_dir, 'input', '{sample}.noadapters.fastq')
+    shell:
+        """
+        cutadapt \
+            -a $(cat {config[conditions][adapter_file]}) \
+            -o {output} \
+            {input.fname}
         """
 
 rule reference_indexing:
@@ -95,7 +112,8 @@ rule reference_indexing:
 
 rule read_mapping:
     input:
-        read_file = os.path.join(output_dir, 'input', '{sample}.fastq'),
+        read_file = os.path.join(
+            output_dir, 'input', '{sample}.'+premapsuffix+'.fastq'),
         reference_dir = os.path.join(
             output_dir, 'read_mapping', '{reference}', 'index')
     output:

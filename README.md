@@ -16,6 +16,7 @@ Furthermore, the following software is used:
 * FastQC
 * BWA
 * samtools
+* cutadapt
 * python 3.6
     * pysam
     * matplotlib
