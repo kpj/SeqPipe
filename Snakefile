@@ -4,6 +4,7 @@ Sequencing workflow
 
 import os
 import re
+import sys
 
 from typing import Any, Dict
 
@@ -79,9 +80,8 @@ for entry in os.scandir(input_dir):
 
         if os.path.exists(pair_fname):
             print(
-                ' > '
-                f'Assuming that "{entry.path}" is paired with "{pair_fname}". '
-            )
+                f' > Assuming that "{entry.path}" '
+                'is paired with "{pair_fname}".', file=sys.stderr)
             secondary_samples.add(clean_sample_name(entry.name))
 
     # remember sample
