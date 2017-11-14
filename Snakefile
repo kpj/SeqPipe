@@ -3,6 +3,9 @@ Sequencing workflow
 """
 
 import os
+import re
+
+from typing import Any, Dict
 
 
 ###
@@ -19,12 +22,72 @@ os.chdir(workflow.basedir)
 do_adapter_trimming = os.path.exists(config['conditions']['adapter_file'])
 premapsuffix = 'noadapters' if do_adapter_trimming else 'raw'
 
+paired_read_file_identifier = 'R2.fastq'
+
+###
+# helper functions
+def clean_sample_name(sname: str) -> str:
+    """ Remove filename suffixes
+    """
+    suffixes = ['.fastq', '.fastq.gz']
+    for suf in suffixes:
+        if sname.endswith(suf):
+            return sname[:-len(suf)]
+    return sname
+
+def generate_read_mapping_input(wildcards: Any) -> Dict[str, str]:
+    """ Generate input files needed to handle both single- and paired-end reads
+    """
+    # order R1 and R2 correctly
+    if wildcards.sample.endswith('R1'):
+        sample1 = wildcards.sample
+        sample2 = wildcards.sample.replace('R1', 'R2')
+    elif wildcards.sample.endswith('R2'):
+        sample1 = wildcards.sample.replace('R2', 'R1')
+        sample2 = wildcards.sample
+    else:
+        sample1 = wildcards.sample
+        sample2 = ''
+
+    # assemble filenames
+    read_file1 = os.path.join(
+        output_dir, 'input', f'{sample1}.{premapsuffix}.fastq')
+    read_file2 = os.path.join(
+        output_dir, 'input', f'{sample2}.{premapsuffix}.fastq') \
+        if len(sample2) > 0 else read_file1
+
+    # remove superfluous files
+    if sample1 not in sample_list:
+        read_file1 = read_file2
+    elif sample2 not in sample_list:
+        read_file2 = read_file1
+
+    return {
+        'read_file1': read_file1,
+        'read_file2': read_file2
+    }
+
 ###
 # file gathering
-sample_list = []
+sample_list = set()
+secondary_samples = set()
 for entry in os.scandir(input_dir):
-    tmp = entry.name.split('.')[0]
-    sample_list.append(tmp)
+    # check for paired-end reads
+    if paired_read_file_identifier in entry.name:
+        pair_fname = entry.path.replace(
+            paired_read_file_identifier, 'R1.fastq')
+
+        if os.path.exists(pair_fname):
+            print(
+                ' > '
+                f'Assuming that "{entry.path}" is paired with "{pair_fname}". '
+            )
+            secondary_samples.add(clean_sample_name(entry.name))
+
+    # remember sample
+    tmp = clean_sample_name(entry.name)
+    sample_list.add(tmp)
+primary_samples = sample_list - secondary_samples
 
 reference_list = []
 for entry in os.scandir(ref_dir):
@@ -38,6 +101,9 @@ qc_files = expand(
 rdist_overview = [os.path.join(
     output_dir, 'results', 'read_distribution_overview.txt')]
 all_result_files = qc_files + rdist_overview
+
+# only consider primary samples for read_mapping (paired-end reads)
+sample_wildcard_constraint = f'({")|(".join(map(re.escape, primary_samples))})'
 
 ###
 # rule definitions
@@ -112,13 +178,14 @@ rule reference_indexing:
 
 rule read_mapping:
     input:
-        read_file = os.path.join(
-            output_dir, 'input', '{sample}.'+premapsuffix+'.fastq'),
+        unpack(generate_read_mapping_input),
         reference_dir = os.path.join(
             output_dir, 'read_mapping', '{reference}', 'index')
     output:
         os.path.join(
             output_dir, 'read_mapping', '{reference}', '{sample}', 'reads.sam')
+    wildcard_constraints:
+        sample = sample_wildcard_constraint
     threads:
         config['runtime']['threads']
     benchmark:
@@ -129,10 +196,19 @@ rule read_mapping:
         """
         mkdir -p $(dirname {workflow.basedir}/{output})
 
+        ref_file="{workflow.basedir}/{input.reference_dir}/reference.fa"
+        read_file1="{workflow.basedir}/{input.read_file1}"
+        read_file2="{workflow.basedir}/{input.read_file2}"
+
+        # handle single-end reads
+        if [ "$read_file1" == "$read_file2" ]; then
+            read_file2=""
+        fi
+
         bwa mem \
             -t {threads} \
-            {workflow.basedir}/{input.reference_dir}/reference.fa \
-            {workflow.basedir}/{input.read_file} \
+            "$ref_file" \
+            "$read_file1" $read_file2 \
             > {workflow.basedir}/{output}
         """
 
@@ -175,12 +251,12 @@ rule read_distribution_overview:
             os.path.join(
                 output_dir, 'read_mapping',
                 '{reference}', '{sample}', 'reads.filtered.sorted.bam'),
-            sample=sample_list, reference=reference_list),
+            sample=primary_samples, reference=reference_list),
         index_files = expand(
             os.path.join(
                 output_dir, 'read_mapping',
                 '{reference}', '{sample}', 'reads.filtered.sorted.bam.bai'),
-            sample=sample_list, reference=reference_list),
+            sample=primary_samples, reference=reference_list),
     output:
         report = os.path.join(output_dir, 'results', 'read_distribution_overview.txt')
     script:
