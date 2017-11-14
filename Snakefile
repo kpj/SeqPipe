@@ -162,9 +162,19 @@ rule adapter_trimming:
             {input.fname}
         """
 
+rule convert_reference_suffix:
+    input:
+        fname = '{prefix}.fa'
+    output:
+        temp('{prefix}.fasta')
+    shell:
+        """
+        cp {input.fname} {output}
+        """
+
 rule reference_indexing:
     input:
-        reference_file = srcdir(os.path.join(ref_dir, '{reference}.fa'))
+        reference_file = srcdir(os.path.join(ref_dir, '{reference}.fasta'))
     output:
         os.path.join(output_dir, 'read_mapping', '{reference}', 'index')
     shell:
