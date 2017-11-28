@@ -71,8 +71,14 @@ def generate_read_mapping_input(wildcards: Any) -> Dict[str, str]:
 ###
 # file gathering
 sample_list = set()
-secondary_samples = set()
+secondary_sample_map = {}
+
+print('Parsing input', file=sys.stderr)
 for entry in os.scandir(input_dir):
+    # remember sample
+    cur_sample = clean_sample_name(entry.name)
+    sample_list.add(cur_sample)
+
     # check for paired-end reads
     if paired_read_file_identifier in entry.name:
         pair_fname = entry.path.replace(
@@ -82,11 +88,13 @@ for entry in os.scandir(input_dir):
             print(
                 f' > Assuming that "{entry.path}" '
                 f'is paired with "{pair_fname}".', file=sys.stderr)
-            secondary_samples.add(clean_sample_name(entry.name))
 
-    # remember sample
-    tmp = clean_sample_name(entry.name)
-    sample_list.add(tmp)
+            clean_paired_fname = clean_sample_name(os.path.basename(pair_fname))
+            assert clean_paired_fname not in secondary_sample_map
+            secondary_sample_map[clean_paired_fname] = \
+                clean_sample_name(entry.name)
+
+secondary_samples = set(secondary_sample_map.values())
 primary_samples = sample_list - secondary_samples
 
 reference_list = []
@@ -94,6 +102,24 @@ for entry in os.scandir(ref_dir):
     tmp = entry.name.split('.')[0]
     reference_list.append(tmp)
 
+# print pipeline execution summary
+print('Mapping-pipeline overview', file=sys.stderr)
+for i, ref in enumerate(sorted(reference_list)):
+    ref_sep = '│' if i < len(reference_list)-1 else ' '
+    ref_knick = '├' if i < len(reference_list)-1 else '└'
+
+    print(f' {ref_knick}── {ref}', file=sys.stderr)
+    for j, sample in enumerate(sorted(primary_samples)):
+        if sample in secondary_sample_map:
+            paired_sample = secondary_sample_map[sample]
+            msg = f'"{sample}" -- "{paired_sample}"'
+        else:
+            msg = f'"{sample}"'
+
+        sam_knick = '├' if j < len(primary_samples)-1 else '└'
+        print(f' {ref_sep}   {sam_knick}── {msg}', file=sys.stderr)
+
+# figure out which result files to generate
 qc_files = expand(
     os.path.join(
         output_dir, 'quality_control', '{sample}'), sample=sample_list) \
