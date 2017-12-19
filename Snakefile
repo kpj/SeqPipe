@@ -125,7 +125,7 @@ qc_files = expand(
         output_dir, 'quality_control', '{sample}'), sample=sample_list) \
     if config['conditions']['assess_read_quality'] else []
 rdist_overview = [os.path.join(
-    output_dir, 'results', 'read_distribution_overview.txt')]
+    output_dir, 'results', 'read_distribution_overview.tsv')]
 all_result_files = qc_files + rdist_overview
 
 # only consider primary samples for read_mapping (paired-end reads)
@@ -294,6 +294,6 @@ rule read_distribution_overview:
                 '{reference}', '{sample}', 'reads.filtered.sorted.bam.bai'),
             sample=primary_samples, reference=reference_list),
     output:
-        report = os.path.join(output_dir, 'results', 'read_distribution_overview.txt')
+        report = os.path.join(output_dir, 'results', 'read_distribution_overview.tsv')
     script:
         'scripts/rdist_overview.py'
