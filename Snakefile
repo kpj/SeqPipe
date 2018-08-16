@@ -164,7 +164,7 @@ rule quality_control:
         read_file = os.path.join(
             output_dir, 'input', '{sample}.'+premapsuffix+'.fastq')
     output:
-        os.path.join(output_dir, 'quality_control', '{sample}')
+        directory(os.path.join(output_dir, 'quality_control', '{sample}'))
     benchmark:
         os.path.join(
             output_dir, 'benchmark', 'quality_control',
@@ -202,7 +202,8 @@ rule reference_indexing:
     input:
         reference_file = srcdir(os.path.join(ref_dir, '{reference}.fasta'))
     output:
-        os.path.join(output_dir, 'read_mapping', '{reference}', 'index')
+        directory(
+            os.path.join(output_dir, 'read_mapping', '{reference}', 'index'))
     shell:
         """
         mkdir -p {output}
