@@ -258,7 +258,7 @@ rule samtools_filter:
         # filters: read quality, secondary reads, supplementary reads
         samtools view \
             -b \
-            -q 10 \
+            -q config[parameters][minimal_mapping_quality] \
             -F 256 \
             -F 2048 \
             {input} > {output}

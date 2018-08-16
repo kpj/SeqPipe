@@ -9,3 +9,6 @@ runtime:
 conditions:
     assess_read_quality: true  # use FastQC to check read quality
     adapter_file: adapter.txt  # skip adapter trimming if file doesn't exist (file should only contain sequence)
+
+parameters:
+    minimal_mapping_quality: 30
