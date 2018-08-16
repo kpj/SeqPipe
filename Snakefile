@@ -99,8 +99,12 @@ primary_samples = sample_list - secondary_samples
 
 reference_list = []
 for entry in os.scandir(ref_dir):
-    tmp = entry.name.split('.')[0]
-    reference_list.append(tmp)
+    fname_without_ext, ext = os.path.splitext(entry.name)
+    if ext not in ('.fa', '.fasta'):
+        print(f'Skipping invalid reference file: "{entry.path}"')
+        continue
+
+    reference_list.append(fname_without_ext)
 
 # print pipeline execution summary
 print('Mapping-pipeline overview', file=sys.stderr)
